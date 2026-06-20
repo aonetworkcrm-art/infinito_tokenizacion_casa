@@ -78,8 +78,11 @@ test.describe("Header y Estado Inicial", () => {
     await expect(footer).toContainText("Buffy");
   });
 
-  test("debe tener canvas de Matrix Rain", async ({ page }) => {
-    await expect(page.locator("#matrixCanvas")).toBeVisible();
+  test("debe tener canvas con letras de INFINITO cayendo", async ({ page }) => {
+    await expect(page.locator("#infinitoCanvas")).toBeVisible();
+    // Verificar que el canvas existe y tiene dimensiones
+    const width = await page.locator("#infinitoCanvas").getAttribute("width");
+    expect(parseInt(width)).toBeGreaterThan(0);
   });
 });
 

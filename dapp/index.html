@@ -6,39 +6,32 @@
 <title>🚀 PROYECTO INFINITO — DApp Familiar</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#050508;--grn:#00ff41;--cy:#00f0ff;--go:#f59e0b;--rd:#ef4444;--pu:#7c3aed;--text:#c8d6e5;--dim:#2d2d44;--card:#0a0a14;--border:rgba(0,255,65,0.12)}
-body{font-family:'Courier New',monospace;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
-#matrixCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.35;pointer-events:none}
-.gd{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;background-image:linear-gradient(rgba(0,255,65,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,255,65,0.03)1px,transparent 1px);background-size:40px 40px}
-.sl{position:fixed;left:0;width:100%;height:2px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,var(--grn),transparent);animation:sd 4s linear infinite;opacity:0.3}
-@keyframes sd{0%{top:-2px}100%{top:100%}}
+:root{--bg:#0f0a06;--grn:#2d8a4e;--cy:#0891b2;--go:#b45309;--rd:#dc2626;--pu:#6d28d9;--text:#d4d4d8;--dim:#78716c;--card:#1c1917;--border:rgba(45,138,78,0.10)}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+#infinitoCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.18;pointer-events:none}
 @keyframes pl{0%,100%{opacity:1}50%{opacity:0.3}}
 @keyframes fi{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes gw{0%,100%{text-shadow:0 0 5px var(--grn),0 0 10px var(--grn)}50%{text-shadow:0 0 10px var(--grn),0 0 20px var(--grn),0 0 30px var(--grn)}}
-@keyframes wh{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
 @keyframes pr{from{width:0%}}
 @keyframes to{0%{opacity:0;transform:translateY(-10px)}15%{opacity:1;transform:translateY(0)}85%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-10px)}}
 .container{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:20px 16px 60px}
-.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border:1px solid var(--border);background:rgba(0,255,65,0.02);flex-wrap:wrap;gap:10px}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border:1px solid var(--border);background:rgba(45,138,78,0.03);flex-wrap:wrap;gap:10px}
 .hdr-label{font-size:9px;color:var(--grn);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:6px}
 .hdr-dot{width:5px;height:5px;border-radius:50%;background:var(--grn);animation:pl 2s ease-in-out infinite}
-.hdr-title{font-size:16px;font-weight:700;background:linear-gradient(135deg,var(--grn),var(--cy));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:2px}
+.hdr-title{font-size:16px;font-weight:700;color:var(--grn);margin-top:2px}
 .hdr-sub{font-size:10px;color:var(--grn);opacity:0.7}
 .hdr-stats{display:flex;gap:16px}
 .hdr-stat{text-align:center}
 .hdr-stat-n{font-size:18px;font-weight:700;color:var(--cy)}
 .hdr-stat-l{font-size:9px;color:var(--grn);text-transform:uppercase;letter-spacing:1px}
 .tabs{display:flex;gap:2px;margin:20px 0 16px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
-.tab{background:transparent;border:none;color:var(--dim);font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;padding:10px 16px;cursor:pointer;transition:all 0.3s;border-bottom:2px solid transparent}
-.tab:hover{color:var(--text);background:rgba(0,255,65,0.03)}
-.tab.act{color:var(--grn);border-bottom-color:var(--grn);text-shadow:0 0 10px rgba(0,255,65,0.3)}
+.tab{background:transparent;border:none;color:var(--dim);font-size:10px;letter-spacing:1px;padding:10px 16px;cursor:pointer;transition:all 0.3s;border-bottom:2px solid transparent}
+.tab:hover{color:var(--text);background:rgba(45,138,78,0.05)}
+.tab.act{color:var(--grn);border-bottom-color:var(--grn)}
 .tc{display:none;animation:fi 0.4s ease}
 .tc.act{display:block}
 .cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:16px}
 .cd{background:var(--card);border:1px solid var(--border);padding:16px;transition:all 0.3s;position:relative;overflow:hidden}
-.cd:hover{border-color:rgba(0,255,65,0.2);transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.3)}
-.cd::before{content:"";position:absolute;top:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--grn),transparent);opacity:0;transition:opacity 0.3s}
-.cd:hover::before{opacity:1}
+.cd:hover{border-color:rgba(45,138,78,0.2);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.3)}
 .cd-icon{font-size:22px;margin-bottom:8px}
 .cd-tt{font-size:9px;color:var(--grn);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
 .cd-vl{font-size:24px;font-weight:700;color:var(--cy);letter-spacing:1px}
@@ -52,24 +45,24 @@ body{font-family:'Courier New',monospace;background:var(--bg);color:var(--text);
 .dr:last-child{border-bottom:none}
 .dr .lb{color:var(--dim);letter-spacing:1px}
 .dr .vl{color:var(--text);text-align:right}
-.pb{height:6px;background:rgba(0,255,65,0.08);border-radius:0;margin:8px 0;overflow:hidden}
+.pb{height:6px;background:rgba(45,138,78,0.1);border-radius:0;margin:8px 0;overflow:hidden}
 .pb-b{height:100%;background:linear-gradient(90deg,var(--grn),var(--cy));border-radius:0;transition:width 1.5s ease}
 .dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
 .dc{padding:20px;background:var(--card);border:1px solid var(--border);position:relative}
 .dc-lock{opacity:0.5;filter:blur(2px);pointer-events:none;position:relative}
-.dc-lock-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,8,0.7);backdrop-filter:blur(2px);border:1px solid var(--go)}
+.dc-lock-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(15,10,6,0.8);backdrop-filter:blur(2px);border:1px solid var(--go)}
 .dc-lock-overlay .lock-icon{font-size:32px;margin-bottom:8px}
 .dc-lock-overlay .lock-tt{font-size:11px;color:var(--go);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
 .dc-lock-overlay .lock-d{font-size:10px;color:var(--dim);text-align:center;padding:0 20px}
-.bt{display:inline-block;padding:8px 20px;border:1px solid var(--border);color:var(--grn);text-decoration:none;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all 0.3s;background:transparent;font-family:"Courier New",monospace;margin-top:8px}
-.bt:hover{border-color:var(--grn);color:var(--grn);background:rgba(0,255,65,0.05)}
-.bt-gr{background:var(--grn);color:#000;border-color:var(--grn);font-weight:600}
-.bt-gr:hover{background:rgba(0,255,65,0.8);color:#000}
+.bt{display:inline-block;padding:8px 20px;border:1px solid var(--border);color:var(--grn);text-decoration:none;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all 0.3s;background:transparent;margin-top:8px}
+.bt:hover{border-color:var(--grn);color:var(--grn);background:rgba(45,138,78,0.08)}
+.bt-gr{background:var(--grn);color:#fff;border-color:var(--grn);font-weight:600}
+.bt-gr:hover{background:rgba(45,138,78,0.85);color:#fff}
 .bt-go{border-color:var(--go);color:var(--go)}
 .bt-go:hover{background:rgba(245,158,11,0.1);color:var(--go)}
 .bt-cy{border-color:var(--cy);color:var(--cy)}
-.bt-cy:hover{background:rgba(0,240,255,0.1);color:var(--cy)}
-.bg{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(0,255,65,0.15);color:var(--grn)}
+.bt-cy:hover{background:rgba(8,145,178,0.1);color:var(--cy)}
+.bg{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(45,138,78,0.2);color:var(--grn)}
 .bg-gr{border-color:rgba(16,185,129,0.2);color:#10b981}
 .bg-gr .dot{background:#10b981}
 .bg-go{border-color:rgba(245,158,11,0.2);color:var(--go)}
@@ -86,7 +79,7 @@ body{font-family:'Courier New',monospace;background:var(--bg);color:var(--text);
 .mt .tk{color:var(--cy);font-weight:600;font-size:11px}
 .mt .pc{font-size:9px;color:var(--grn)}
 .ft{margin-top:40px;padding:16px 0;border-top:1px solid var(--border);text-align:center;font-size:9px;color:var(--dim);letter-spacing:1px}
-.inp{background:transparent;border:1px solid var(--border);color:var(--text);font-family:"Courier New",monospace;padding:6px 10px;font-size:11px;width:100%;transition:border-color 0.3s}
+.inp{background:transparent;border:1px solid var(--border);color:var(--text);padding:6px 10px;font-size:11px;width:100%;transition:border-color 0.3s}
 .inp:focus{border-color:var(--grn);outline:none}
 #notif{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;padding:10px 24px;font-size:10px;letter-spacing:1px;border:1px solid var(--border);background:var(--card);color:var(--grn);display:none;animation:to 3s ease forwards;pointer-events:none}
 #notif.show{display:block}
@@ -94,9 +87,10 @@ body{font-family:'Courier New',monospace;background:var(--bg);color:var(--text);
 </style>
 </head>
 <body>
-<canvas id="matrixCanvas"></canvas>
-<div class="gd"></div>
-<div class="sl"></div>
+<!-- Canvas con lluvia de letras INFINITO -->
+<canvas id="infinitoCanvas"></canvas>
+<!-- Fondo con gradientes sutiles -->
+<div style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 30% 20%,rgba(45,138,78,0.06) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(8,145,178,0.04) 0%,transparent 60%);"></div>
 
 <div class="container">
 
@@ -406,26 +400,7 @@ function showNotif(msg, color) {
   setTimeout(function(){ n.className = ""; }, 3000);
 }
 
-// ─── MATRIX RAIN ───
-(function(){
-var c=document.getElementById("matrixCanvas"),ctx=c.getContext("2d");
-var W,H;
-function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
-resize();window.onresize=resize;
-var cols=Math.floor(W/12),drops=Array(cols).fill(1).map(function(){return Math.random()*-80});
-function draw(){
-ctx.fillStyle="rgba(5,5,8,0.045)";ctx.fillRect(0,0,W,H);
-ctx.fillStyle="#00ff41";ctx.font="10px monospace";
-ctx.shadowColor="#00ff41";ctx.shadowBlur=4;
-for(var i=0;i<cols;i++){
-var x=i*12,y=drops[i]*10,char=String.fromCharCode(0x30A0+Math.random()*96);
-if(y>0&&y<H){ctx.fillStyle=y<80?"rgba(0,255,65,0.95)":"rgba(0,255,65,0.5)";ctx.fillText(char,x,y)}
-drops[i]+=0.5+Math.random()*0.5;if(y>50&&Math.random()>0.98)drops[i]=Math.random()*-60
-}
-ctx.shadowBlur=0;requestAnimationFrame(draw)
-}
-draw()
-})();
+
 
 // ─── TAB SYSTEM ───
 function switchTab(tabId){
@@ -626,8 +601,48 @@ var el = document.querySelector(".hdr-sub");
 if(el) el.textContent = d.toLocaleDateString("es-ES",opts)+"  |  Polygon Amoy Testnet";
 }
 
+// ─── IN-FINITY RAIN (Letras de INFINITO cayendo) ───
+(function(){
+var c=document.getElementById("infinitoCanvas");
+if(!c)return;
+var ctx=c.getContext("2d");
+var W,H;
+function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+resize();window.onresize=resize;
+var letters="INFINITO";
+var fontSize=14;
+var cols=Math.floor(W/(fontSize*0.8));
+var drops=[];
+for(var i=0;i<cols;i++){
+drops[i]=Math.random()*-120;
+}
+var grn="#2d8a4e";
+var cy="#0891b2";
+function draw(){
+ctx.fillStyle="rgba(15,10,6,0.06)";
+ctx.fillRect(0,0,W,H);
+for(var i=0;i<drops.length;i++){
+var text=letters[Math.floor(Math.random()*letters.length)];
+var x=i*(fontSize*0.8);
+var y=drops[i]*fontSize*1.2;
+if(y>0&&y<H){
+var alpha=Math.min(1,0.3+Math.random()*0.7);
+var useCyan=Math.random()>0.85;
+ctx.fillStyle=useCyan?cy:grn;
+ctx.globalAlpha=alpha;
+ctx.font=fontSize+"px monospace";
+ctx.fillText(text,x,y);
+ctx.globalAlpha=1;
+}
+drops[i]+=0.3+Math.random()*0.6;
+if(y>H+50&&Math.random()>0.98)drops[i]=Math.random()*-60;
+}
+requestAnimationFrame(draw);
+}
+draw();
+})();
+
 console.log("PROYECTO INFINITO — DApp Familiar Cargada");
-console.log("\"Mientras todos dormian, yo construia el futuro.\"");
 </script>
 </body>
 </html>
