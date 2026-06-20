@@ -71,45 +71,77 @@ async function freezeAnimations(page) {
  */
 async function seedWhaleFeed(page) {
   await page.evaluate(() => {
-    // Establecer valores fijos para el radar
-    document.getElementById("whale-juvenil").textContent = "8";
-    document.getElementById("whale-azul").textContent = "5";
-    document.getElementById("whale-dorada").textContent = "3";
-    document.getElementById("whale-mitica").textContent = "1";
+    // Sembrar mempool con datos fijos para screenshot determinista
+    const stats = ["mp-total-val","mp-tx-count","mp-gas-avg","mp-whale-count"];
+    const statVals = ["$3,840,690","18","87","6"];
+    stats.forEach((id,i)=>{const el=document.getElementById(id);if(el)el.textContent=statVals[i]});
 
-    // Sembrar filas del feed
-    const feed = document.getElementById("whale-feed");
-    if (feed) {
-      const rows = feed.querySelectorAll(".wf-row");
-      const stableData = [
-        { type: "Dorada", value: "420,690", addr: "0x7ceB...1f9", time: "14:32", conf: "96%" },
-        { type: "Azul", value: "184,500", addr: "0x2791...174", time: "14:28", conf: "82%" },
-        { type: "Juvenil", value: "23,400", addr: "0xc213...e8f", time: "14:15", conf: "71%" },
-        { type: "Mitica", value: "2,150,000", addr: "0x0d50...F3a", time: "13:58", conf: "94%" },
-        { type: "Dorada", value: "385,200", addr: "0x1a2b...4Cd", time: "13:42", conf: "78%" },
+    document.getElementById("mp-block-info").textContent = "Bloque #8942031";
+    document.getElementById("mp-age-info").textContent = "2s atr\u00e1s";
+
+    // Sembrar Top 3 Whales
+    const topList = document.getElementById("mp-top-list");
+    if (topList) {
+      const whales = [
+        {rank:"\uD83E\uDD47",emoji:"\uD83D\uDC8E",type:"M\u00edtica",val:2150000,gas:142,from:"0x7ceB...1f9",to:"0x2791...174",age:"4s"},
+        {rank:"\uD83E\uDD48",emoji:"\u2728",type:"Dorada",val:845000,gas:89,from:"0xc213...e8f",to:"0x0d50...F3a",age:"12s"},
+        {rank:"\uD83E\uDD49",emoji:"",type:"Azul",val:192000,gas:56,from:"0x1a2b...4Cd",to:"0x7ceB...1f9",age:"23s"},
       ];
-      rows.forEach((row, i) => {
-        if (i < stableData.length) {
-          const d = stableData[i];
-          const confVal = parseInt(d.conf);
-          const confColor = confVal > 85 ? "var(--grn)" : confVal > 60 ? "var(--go)" : "var(--rd)";
-          const emojiMap = { Juvenil: "", Azul: "", Dorada: "✨", Mitica: "💎" };
-          row.innerHTML =
-            `<span>${emojiMap[d.type]} <span style="color:${confColor}">${d.type}</span></span>` +
-            `<span style="color:var(--cy)">$${d.value}</span>` +
-            `<span style="color:var(--dim)">${d.addr}</span>` +
-            `<span style="color:var(--dim)">${d.time}</span>` +
-            `<span style="color:${confColor}">${d.conf}</span>`;
-        }
+      topList.innerHTML = whales.map(w =>
+        `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:10px">` +
+        `<span>${w.rank} ${w.emoji} <span style="color:var(--cy);font-weight:600">${w.type}</span></span>` +
+        `<span style="font-weight:700;color:var(--rd)">$${w.val.toLocaleString()}</span>` +
+        `<span style="font-family:monospace;color:var(--dim);font-size:8px">${w.gas} Gwei</span>` +
+        `<span style="font-family:monospace;color:var(--dim);font-size:8px">${w.from} \u2192 ${w.to}</span>` +
+        `<span style="color:var(--dim);font-size:8px">${w.age} atr\u00e1s</span></div>`
+      ).join("");
+    }
+
+    // Sembrar alert box
+    const alertTitle = document.getElementById("mp-alert-title");
+    const alertDesc = document.getElementById("mp-alert-desc");
+    const alertVal = document.getElementById("mp-alert-val");
+    if (alertTitle) alertTitle.textContent = "\uD83D\uDC0B Ballena M\u00edtica Detectada";
+    if (alertDesc) alertDesc.textContent = "Transacci\u00f3n de m\u00e1s de $1M USD detectada en el mempool. Preparando arbitraje Flash Loan...";
+    if (alertVal) alertVal.textContent = "$2,150,000";
+
+    // Sembrar filas del mempool
+    const feed = document.getElementById("mp-feed");
+    if (feed) {
+      const head = feed.querySelector(".mp-row-head");
+      feed.innerHTML = "";
+      if (head) feed.appendChild(head);
+
+      const txData = [
+        {e:"\uD83D\uDC8E",t:"M\u00edtica",v:2150000,g:142,f:"0x7ceB...1f9",to:"0x2791...174",c:94},
+        {e:"\u2728",t:"Dorada",v:845000,g:89,f:"0xc213...e8f",to:"0x0d50...F3a",c:87},
+        {e:"",t:"Azul",v:192000,g:56,f:"0x1a2b...4Cd",to:"0x7ceB...1f9",c:76},
+        {e:"\u2728",t:"Dorada",v:420690,g:128,f:"0x2791...174",to:"0xc213...e8f",c:92},
+        {e:"",t:"Juvenil",v:23400,g:35,f:"0x0d50...F3a",to:"0x1a2b...4Cd",c:63},
+        {e:"",t:"Azul",v:156000,g:72,f:"0x0d50...F3a",to:"0x7ceB...1f9",c:81},
+        {e:"\u2728",t:"Dorada",v:385200,g:95,f:"0xc213...e8f",to:"0x2791...174",c:78},
+        {e:"",t:"Juvenil",v:18700,g:42,f:"0x1a2b...4Cd",to:"0x0d50...F3a",c:55},
+        {e:"",t:"Juvenil",v:31200,g:38,f:"0x2791...174",to:"0xc213...e8f",c:69},
+        {e:"",t:"Azul",v:114500,g:61,f:"0x7ceB...1f9",to:"0x1a2b...4Cd",c:84},
+      ];
+
+      txData.forEach(tx => {
+        const row = document.createElement("div");
+        row.className = "mp-row";
+        const valClass = tx.v >= 1000000 ? "mp-val-mega" : tx.v >= 250000 ? "mp-val-hi" : tx.v >= 50000 ? "mp-val-md" : "mp-val-lo";
+        const confColor = tx.c > 85 ? "var(--grn)" : tx.c > 60 ? "var(--go)" : "var(--rd)";
+        row.innerHTML =
+          `<span>${tx.e}</span>` +
+          `<span style="color:${confColor}">${tx.t}</span>` +
+          `<span class="mp-val ${valClass}">$${tx.v.toLocaleString()}</span>` +
+          `<span class="mp-gas">${tx.g} Gwei</span>` +
+          `<span class="mp-addr">${tx.f}</span>` +
+          `<span class="mp-addr">${tx.to}</span>` +
+          `<span class="mp-conf" style="color:${confColor}">${tx.c}%</span>`;
+        feed.appendChild(row);
       });
 
-      // Ocultar los 7 rows extras (solo mostramos 5 estables con datos fijos)
-      // para que la altura del feed sea determinista entre ejecuciones
-      for (let i = stableData.length; i < rows.length; i++) {
-        rows[i].style.display = "none";
-      }
-      // Mantener maxHeight original (400px) para respetar el CSS real de la DApp
-      // overflow:hidden evita que un scrollbar cambie el layout
+      // Ocultar scroll para altura fija
       feed.style.overflow = "hidden";
     }
   });
@@ -172,14 +204,14 @@ test.describe("Whale Radar — Regresión Visual", () => {
     await expect(page).toHaveScreenshot("whale-full.png", { fullPage: true });
   });
 
-  test("4 categorías de ballenas deben verse correctamente", async ({ page }) => {
-    const categories = page.locator("#tab-whales .cg").first();
-    await expect(categories).toHaveScreenshot("whale-categories.png");
+  test("estadísticas del mempool deben verse correctamente", async ({ page }) => {
+    const stats = page.locator(".mp-stats");
+    await expect(stats).toHaveScreenshot("whale-mempool-stats.png");
   });
 
   test("feed de transacciones debe coincidir con snapshot", async ({ page }) => {
-    const feed = page.locator("#whale-feed");
-    await expect(feed).toHaveScreenshot("whale-feed.png");
+    const feed = page.locator("#mp-feed");
+    await expect(feed).toHaveScreenshot("whale-mempool-feed.png");
   });
 
   test("oportunidades flash loan bloqueadas deben coincidir", async ({ page }) => {

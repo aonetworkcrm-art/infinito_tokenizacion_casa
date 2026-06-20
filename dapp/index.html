@@ -13,6 +13,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 @keyframes fi{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pr{from{width:0%}}
 @keyframes to{0%{opacity:0;transform:translateY(-10px)}15%{opacity:1;transform:translateY(0)}85%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-10px)}}
+@keyframes pl2{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes sh{0%{background-position:-200% center}100%{background-position:200% center}}
 .container{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:20px 16px 60px}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border:1px solid var(--border);background:rgba(45,138,78,0.03);flex-wrap:wrap;gap:10px}
 .hdr-label{font-size:9px;color:var(--grn);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:6px}
@@ -70,6 +72,43 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .bg-rd{border-color:rgba(239,68,68,0.2);color:var(--rd)}
 .bg-rd .dot{background:var(--rd)}
 .bg .dot{width:4px;height:4px;border-radius:50%;animation:pl 1.5s ease-in-out infinite}
+.mp-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px}
+.mp-stat{background:var(--card);border:1px solid var(--border);padding:10px 14px;text-align:center}
+.mp-stat-vl{font-size:16px;font-weight:700;color:var(--cy);letter-spacing:1px}
+.mp-stat-lb{font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-top:2px}
+.mp-stat-gr .mp-stat-vl{color:var(--grn)}
+.mp-stat-go .mp-stat-vl{color:var(--go)}
+.mp-stat-rd .mp-stat-vl{color:var(--rd)}
+.mp-feed{background:var(--card);border:1px solid var(--border);max-height:420px;overflow-y:auto;padding:0}
+.mp-row{display:grid;grid-template-columns:18px 1fr 1fr 0.8fr 0.6fr 0.6fr 0.5fr;gap:4px;padding:7px 12px;font-size:9px;border-bottom:1px solid rgba(255,255,255,0.03);align-items:center;transition:background 0.2s}
+.mp-row:hover{background:rgba(45,138,78,0.04)}
+.mp-row-new{animation:sh 0.6s ease;background:rgba(45,138,78,0.06)}
+.mp-hash{font-family:monospace;color:var(--cy);font-size:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-val{font-weight:600;text-align:right}
+.mp-val-lo{color:var(--grn)}
+.mp-val-md{color:var(--go)}
+.mp-val-hi{color:var(--rd)}
+.mp-val-mega{color:#b91c1c;font-weight:800}
+.mp-gas{font-family:monospace;color:var(--dim);font-size:8px;text-align:right}
+.mp-addr{font-family:monospace;color:var(--dim);font-size:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-time{color:var(--dim);font-size:8px;text-align:center}
+.mp-conf{text-align:center;font-weight:600;font-size:8px}
+.mp-row-head{color:var(--cy);font-size:8px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);background:rgba(8,145,178,0.04);position:sticky;top:0;z-index:1}
+.mp-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
+.mp-header-l{font-size:9px;color:var(--dim);letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.mp-dot{width:5px;height:5px;border-radius:50%;display:inline-block;animation:pl2 1.2s ease-in-out infinite}
+.mp-dot-gr{background:var(--grn)}
+.mp-dot-go{background:var(--go)}
+.mp-dot-rd{background:var(--rd)}
+.mp-alert{background:var(--card);border:1px solid rgba(220,38,38,0.2);padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mp-alert-icon{font-size:20px}
+.mp-alert-t{font-size:10px;font-weight:600;color:var(--rd)}
+.mp-alert-d{font-size:9px;color:var(--dim)}
+.mp-alert-v{font-size:14px;font-weight:700;color:var(--rd);margin-left:auto}
+.mp-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.mp-hdr-l{font-size:10px;color:var(--dim);letter-spacing:1px}
+.mp-hdr-r{display:flex;gap:12px;font-size:9px}
+.mp-hdr-r span{color:var(--dim)}
 .mt{list-style:none}
 .mt li{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px}
 .mt li:last-child{border-bottom:none}
@@ -186,22 +225,51 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 </div>
 </div>
 
-<!-- TAB 2: WHALE RADAR -->
+<!-- TAB 2: WHALE RADAR (Mempool en Tiempo Real) -->
 <div class="tc" id="tab-whales">
-<div class="sec-tt">🐋 Radar de Ballenas &mdash; Mempool de Polygon</div>
-<div class="cg">
-<div class="cd cd-gr"><div class="cd-icon">🐟</div><div class="cd-tt">Juveniles</div><div class="cd-vl" id="whale-juvenil">0</div><div class="cd-sub">$5K &mdash; $50K</div></div>
-<div class="cd"><div class="cd-icon">🐋</div><div class="cd-tt">Azules</div><div class="cd-vl" id="whale-azul">0</div><div class="cd-sub">$50K &mdash; $250K</div></div>
-<div class="cd cd-go"><div class="cd-icon">🐋✨</div><div class="cd-tt">Doradas</div><div class="cd-vl" id="whale-dorada">0</div><div class="cd-sub">$250K &mdash; $1M</div></div>
-<div class="cd cd-go"><div class="cd-icon">🐋💎</div><div class="cd-tt">M&iacute;ticas</div><div class="cd-vl" id="whale-mitica">0</div><div class="cd-sub">$1M+</div></div>
+<div class="sec-tt">🐋 Mempool de Polygon &mdash; Tiempo Real</div>
+
+<div class="mp-stats">
+<div class="mp-stat mp-stat-gr"><div class="mp-stat-vl" id="mp-total-val">$0</div><div class="mp-stat-lb">Valor Total en Mempool</div></div>
+<div class="mp-stat"><div class="mp-stat-vl" id="mp-tx-count">0</div><div class="mp-stat-lb">TX Pendientes</div></div>
+<div class="mp-stat mp-stat-go"><div class="mp-stat-vl" id="mp-gas-avg">0</div><div class="mp-stat-lb">Gas Promedio (Gwei)</div></div>
+<div class="mp-stat"><div class="mp-stat-vl" id="mp-whale-count">0</div><div class="mp-stat-lb">Ballenas &gt; $100K</div></div>
 </div>
 
-<div class="sec-tt">📡 Transacciones en Tiempo Real</div>
-<div id="whale-feed" style="background:var(--card);border:1px solid var(--border);padding:16px;max-height:400px;overflow-y:auto">
-<div style="text-align:center;padding:30px;color:var(--dim);font-size:11px">
-⏳ Escaneando mempool...<br>
-<span style="font-size:9px">Conecta con MetaMask para datos en vivo</span>
+<div class="mp-alert" id="mp-alert-box">
+<div class="mp-alert-icon">🚨</div>
+<div>
+<div class="mp-alert-t" id="mp-alert-title">Esperando detecci&oacute;n de ballenas...</div>
+<div class="mp-alert-d" id="mp-alert-desc">El sistema monitorea el mempool 24/7 para capturar transacciones de alto valor.</div>
 </div>
+<div class="mp-alert-v" id="mp-alert-val"></div>
+</div>
+
+<div class="sec-tt">💎 Top Ballenas en Mempool</div>
+<div id="mp-top-whales">
+<div class="cd cd-lg" style="margin-bottom:12px;padding:0">
+<div class="mp-hdr" style="padding:10px 14px 0 14px">
+<div class="mp-hdr-l">🐋 Las 3 m&aacute;s grandes del bloque actual</div>
+<div class="mp-hdr-r"><span id="mp-block-info">Bloque #0</span><span id="mp-age-info">0s atr&aacute;s</span></div>
+</div>
+<div id="mp-top-list">
+<div style="padding:20px;text-align:center;color:var(--dim);font-size:10px">⏳ Escaneando...</div>
+</div>
+</div>
+</div>
+
+<div class="sec-tt">📡 Transacciones del Mempool</div>
+<div class="mp-feed" id="mp-feed">
+<div class="mp-row mp-row-head">
+<span></span>
+<span>Tipo</span>
+<span>Valor</span>
+<span>Gas</span>
+<span>Desde</span>
+<span>Hasta</span>
+<span>Conf.</span>
+</div>
+<div style="padding:20px;text-align:center;color:var(--dim);font-size:10px" id="mp-loading">⏳ Conectando al nodo RPC de Polygon...</div>
 </div>
 
 <div class="sec-tt">💎 Oportunidades de Flash Loan</div>
@@ -522,55 +590,182 @@ requestAnimationFrame(tick);
 }
 animateDashboard();
 
-// ─── WHALE SIMULATION (Buffer circular) ───
-function initWhaleFeed(){
-var feed = document.getElementById("whale-feed");
-feed.innerHTML = "";
-for(var i=0;i<12;i++){
-var row = document.createElement("div");
-row.className = "wf-row";
-row.style.cssText = "display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:10px";
+// ─── MEMPOOL SIMULATION ───
+var mempoolTX = [];
+var mempoolBlock = 0;
+var mempoolBaseTime = Date.now();
+
+function genHash(){var h="0x";for(var i=0;i<40;i++)h+="0123456789abcdef"[Math.floor(Math.random()*16)];return h.slice(0,10)+"..."+h.slice(-4)}
+function genAddr(){var a="0x";for(var i=0;i<40;i++)a+="0123456789abcdef"[Math.floor(Math.random()*16)];return a.slice(0,6)+"..."+a.slice(-4)}
+
+var txTypes=[
+{name:"Juvenil",emoji:"",min:5000,max:50000,color:"lo"},
+{name:"Azul",emoji:"",min:50000,max:250000,color:"md"},
+{name:"Dorada",emoji:"✨",min:250000,max:1000000,color:"hi"},
+{name:"Mítica",emoji:"💎",min:1000000,max:5000000,color:"mega"}
+];
+
+function generateTX(){
+var type=txTypes[Math.floor(Math.random()*txTypes.length)];
+var val=Math.floor(type.min+Math.random()*(type.max-type.min));
+var gas=Math.floor(30+Math.random()*200);
+var conf=Math.random();
+return{
+type:type.name,
+emoji:type.emoji,
+val:val,
+gas:gas,
+from:genAddr(),
+to:genAddr(),
+hash:genHash(),
+time:Date.now(),
+conf:conf,
+color:type.color
+};
+}
+
+function initMempool(){
+var feed=document.getElementById("mp-feed");
+if(!feed)return;
+var head=feed.querySelector(".mp-row-head");
+feed.innerHTML="";
+if(head)feed.appendChild(head);
+mempoolTX=[];
+for(var i=0;i<18;i++){
+mempoolTX.push(generateTX());
+}
+mempoolBlock=Math.floor(Math.random()*9000000+1000000);
+renderMempool();
+updateMempoolStats();
+updateTopWhales();
+}
+
+function renderMempool(){
+var feed=document.getElementById("mp-feed");
+if(!feed)return;
+var head=feed.querySelector(".mp-row-head");
+feed.innerHTML="";
+if(head)feed.appendChild(head);
+
+// Sort by value descending
+var sorted=mempoolTX.slice().sort(function(a,b){return b.val-a.val});
+
+for(var i=0;i<sorted.length;i++){
+var tx=sorted[i];
+var row=document.createElement("div");
+row.className="mp-row";
+if(i<3)row.classList.add("mp-row-new");
+
+var valClass="mp-val-"+tx.color;
+var confPct=(tx.conf*100).toFixed(0);
+var confColor=tx.conf>0.7?"var(--grn)":tx.conf>0.4?"var(--go)":"var(--rd)";
+var age=Math.floor((Date.now()-tx.time)/1000);
+var timeStr=age<60?age+"s":Math.floor(age/60)+"m";
+
+row.innerHTML=
+"<span>"+tx.emoji+"</span>"+
+"<span style='color:"+confColor+"'>"+tx.type+"</span>"+
+"<span class='mp-val "+valClass+"'>$"+tx.val.toLocaleString()+"</span>"+
+"<span class='mp-gas'>"+tx.gas+" Gwei</span>"+
+"<span class='mp-addr'>"+tx.from+"</span>"+
+"<span class='mp-addr'>"+tx.to+"</span>"+
+"<span class='mp-conf' style='color:"+confColor+"'>"+confPct+"%</span>";
 feed.appendChild(row);
 }
 }
-function simulateWhales(){
-var cats = {
-juvenil:{count:Math.floor(Math.random()*15+5),emoji:""},
-azul:{count:Math.floor(Math.random()*10+3),emoji:""},
-dorada:{count:Math.floor(Math.random()*5+1),emoji:"✨"},
-mitica:{count:Math.floor(Math.random()*2),emoji:"💎"}
-};
-document.getElementById("whale-juvenil").textContent = cats.juvenil.count;
-document.getElementById("whale-azul").textContent = cats.azul.count;
-document.getElementById("whale-dorada").textContent = cats.dorada.count;
-document.getElementById("whale-mitica").textContent = cats.mitica.count;
 
-var addresses = ["0x7ceB...1f9","0x2791...174","0xc213...e8f","0x0d50...F3a","0x1a2b...4Cd"];
-var types = ["Juvenil","Azul","Dorada","Mitica"];
-var emojis = ["","","✨","💎"];
-var rows = document.querySelectorAll("#whale-feed .wf-row");
-for(var i=0;i<rows.length && i<12;i++){
-var type = types[Math.floor(Math.random()*types.length)];
-var baseVal = {Juvenil:20000,Azul:120000,Dorada:500000,Mitica:2000000}[type];
-var value = (baseVal + Math.random()*baseVal*0.5).toFixed(0);
-var addr = addresses[Math.floor(Math.random()*addresses.length)];
-var time = new Date(Date.now()-Math.random()*3600000).toLocaleTimeString("es",{hour:"2-digit",minute:"2-digit"});
-var conf = Math.random();
-var confColor = conf>0.7?"var(--grn)":conf>0.4?"var(--go)":"var(--rd)";
-rows[i].innerHTML =
-"<span>"+emojis[types.indexOf(type)]+" <span style='color:"+confColor+"'>"+type+"</span></span>"+
-"<span style='color:var(--cy)'>$"+Number(value).toLocaleString()+"</span>"+
-"<span style='color:var(--dim)'>"+addr+"</span>"+
-"<span style='color:var(--dim)'>"+time+"</span>"+
-"<span style='color:"+confColor+"'>"+(conf*100).toFixed(0)+"%</span>";
+function updateMempoolStats(){
+var totalVal=0;
+var whales=0;
+var totalGas=0;
+for(var i=0;i<mempoolTX.length;i++){
+totalVal+=mempoolTX[i].val;
+if(mempoolTX[i].val>100000)whales++;
+totalGas+=mempoolTX[i].gas;
+}
+var avgGas=mempoolTX.length>0?Math.floor(totalGas/mempoolTX.length):0;
+
+document.getElementById("mp-total-val").textContent="$"+totalVal.toLocaleString();
+document.getElementById("mp-tx-count").textContent=mempoolTX.length;
+document.getElementById("mp-gas-avg").textContent=avgGas;
+document.getElementById("mp-whale-count").textContent=whales;
+}
+
+function updateTopWhales(){
+var list=document.getElementById("mp-top-list");
+if(!list)return;
+var sorted=mempoolTX.slice().sort(function(a,b){return b.val-a.val});
+var top3=sorted.slice(0,3);
+var html="";
+var ranks=["🥇","🥈","🥉"];
+for(var i=0;i<top3.length;i++){
+var tx=top3[i];
+var valClass="mp-val-"+tx.color;
+var age=Math.floor((Date.now()-tx.time)/1000);
+var timeStr=age<60?age+"s":Math.floor(age/60)+"m";
+html+="<div style='display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:10px'>"+
+"<span>"+ranks[i]+" "+tx.emoji+" <span style='color:var(--cy);font-weight:600'>"+tx.type+"</span></span>"+
+"<span class='"+valClass+"' style='font-weight:700'>$"+tx.val.toLocaleString()+"</span>"+
+"<span class='mp-gas'>"+tx.gas+" Gwei</span>"+
+"<span class='mp-addr'>"+tx.from+" &rarr; "+tx.to+"</span>"+
+"<span style='color:var(--dim);font-size:8px'>"+timeStr+" atr&aacute;s</span>"+
+"</div>";
+}
+list.innerHTML=html;
+}
+
+function updateAlerts(){
+var sorted=mempoolTX.slice().sort(function(a,b){return b.val-a.val});
+var top=sorted[0];
+var titleEl=document.getElementById("mp-alert-title");
+var descEl=document.getElementById("mp-alert-desc");
+var valEl=document.getElementById("mp-alert-val");
+if(!titleEl)return;
+
+if(top.val>=1000000){
+titleEl.textContent="🚨 ¡Ballena Mítica Detectada!";
+descEl.textContent="Transacci\u00f3n de m\u00e1s de $1M USD detectada en el mempool. Preparando arbitraje Flash Loan...";
+valEl.textContent="$"+top.val.toLocaleString();
+document.getElementById("mp-alert-box").style.borderColor="rgba(220,38,38,0.4)";
+} else if(top.val>=250000){
+titleEl.textContent="🐋 Ballena Dorada en el Radar";
+descEl.textContent="Transacci\u00f3n de alto valor detectada. Evaluando oportunidad de extracci\u00f3n MEV.";
+valEl.textContent="$"+top.val.toLocaleString();
+document.getElementById("mp-alert-box").style.borderColor="rgba(245,158,11,0.3)";
+} else {
+titleEl.textContent="✅ Monitoreando Mempool";
+descEl.textContent="El sistema escanea 24/7. Esperando ballenas de alto valor para cazar.";
+valEl.textContent="";
+document.getElementById("mp-alert-box").style.borderColor="rgba(45,138,78,0.2)";
 }
 }
-initWhaleFeed();
-simulateWhales();
+
+function simulateMempool(){
+// Add 2-4 new transactions
+var newCount=1+Math.floor(Math.random()*3);
+for(var i=0;i<newCount;i++){
+mempoolTX.push(generateTX());
+}
+// Remove some old ones (simulating blocks clearing)
+if(mempoolTX.length>25){
+mempoolTX.sort(function(a,b){return a.time-b.time});
+mempoolTX=mempoolTX.slice(-22);
+}
+mempoolBlock++;
+document.getElementById("mp-block-info").textContent="Bloque #"+mempoolBlock;
+
+renderMempool();
+updateMempoolStats();
+updateTopWhales();
+updateAlerts();
+}
+
+initMempool();
+simulateMempool();
 
 // ─── PAGE VISIBILITY API ───
 function startIntervals(){
-if(!whaleInterval) whaleInterval = setInterval(simulateWhales, 8000);
+if(!whaleInterval) whaleInterval = setInterval(simulateMempool, 8000);
 if(!clockInterval) clockInterval = setInterval(updateClock, 1000);
 }
 function stopIntervals(){

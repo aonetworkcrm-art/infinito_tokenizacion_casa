@@ -38,8 +38,8 @@ async function clickVote(page, propId, isYes) {
 // ═══════════════════════════════════════════════════════════════════
 
 test.beforeEach(async ({ page }) => {
-  await page.goto(DAPP_PATH);
-  await page.waitForSelector("#tab-dashboard.act", { timeout: 5000 });
+  await page.goto(DAPP_PATH, { waitUntil: "networkidle" });
+  await page.waitForSelector("#tab-dashboard.act", { timeout: 10000 });
 });
 
 // ═══════════════════════════════════════════════════════════════════
@@ -101,7 +101,7 @@ test.describe("Sistema de Tabs", () => {
     await page.locator(".tab[data-tab='tab-whales']").click();
     await expect(page.locator("#tab-whales")).toHaveClass(/act/);
     await expect(page.locator("#tab-dashboard")).not.toHaveClass(/act/);
-    await expect(page.locator("#whale-juvenil")).toBeVisible();
+    await expect(page.locator("#mp-total-val")).toBeVisible();
   });
 
   test("click en Content Locker debe activar staking", async ({ page }) => {
@@ -356,15 +356,15 @@ test.describe("Whale Radar", () => {
     await expect(page.locator("#tab-whales")).toHaveClass(/act/);
   });
 
-  test("debe mostrar las 4 categorías de ballenas", async ({ page }) => {
-    await expect(page.locator("#whale-juvenil")).toBeVisible();
-    await expect(page.locator("#whale-azul")).toBeVisible();
-    await expect(page.locator("#whale-dorada")).toBeVisible();
-    await expect(page.locator("#whale-mitica")).toBeVisible();
+  test("debe mostrar las estadísticas del mempool", async ({ page }) => {
+    await expect(page.locator("#mp-total-val")).toBeVisible();
+    await expect(page.locator("#mp-tx-count")).toBeVisible();
+    await expect(page.locator("#mp-gas-avg")).toBeVisible();
+    await expect(page.locator("#mp-whale-count")).toBeVisible();
   });
 
-  test("debe haber filas en el feed de ballenas", async ({ page }) => {
-    const count = await page.locator(".wf-row").count();
+  test("debe haber filas en el feed del mempool", async ({ page }) => {
+    const count = await page.locator(".mp-row:not(.mp-row-head)").count();
     expect(count).toBeGreaterThan(0);
   });
 
