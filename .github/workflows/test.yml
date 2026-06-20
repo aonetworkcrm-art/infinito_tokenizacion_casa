@@ -1,0 +1,101 @@
+# 🧪 PROYECTO INFINITO — Test Suite Automatizada
+# ================================================
+# Ejecuta 220 tests backend (pytest) + 44 tests frontend (Playwright)
+# en cada push a main/develop y en cada Pull Request.
+# ================================================
+
+name: Test Suite
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "22"
+
+jobs:
+
+  # ─── BACKEND: 220 tests Python (pytest) ───────────────────────────
+  backend:
+    name: "Backend (pytest) — 220 tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+          cache-dependency-path: proyecto-infinito/requirements.txt
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-asyncio pytest-cov
+          pip install fastapi uvicorn httpx
+          pip install -r requirements.txt
+
+      - name: Run backend tests with coverage
+        run: |
+          python -m pytest tests/ -v --tb=short --cov=modulos --cov=api_server.py --cov-report=term-missing --cov-report=html --cov-report=xml
+        working-directory: proyecto-infinito
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: proyecto-infinito/coverage_html/
+          retention-days: 7
+
+      - name: Upload coverage XML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: proyecto-infinito/coverage.xml
+          retention-days: 7
+
+  # ─── FRONTEND: 44 tests Playwright ────────────────────────────────
+  frontend:
+    name: "Frontend (Playwright) — 44 tests"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: proyecto-infinito/package-lock.json
+
+      - name: Install Node.js dependencies
+        run: npm ci
+        working-directory: proyecto-infinito
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+        working-directory: proyecto-infinito
+
+      - name: Run Playwright tests
+        run: npx playwright test tests/test_dapp_frontend.spec.js --reporter=list
+        working-directory: proyecto-infinito
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: proyecto-infinito/playwright-report/
+          retention-days: 7

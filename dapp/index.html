@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚀 PROYECTO INFINITO — DApp Familiar</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#050508;--grn:#00ff41;--cy:#00f0ff;--go:#f59e0b;--rd:#ef4444;--pu:#7c3aed;--text:#c8d6e5;--dim:#2d2d44;--card:#0a0a14;--border:rgba(0,255,65,0.12)}
+body{font-family:'Courier New',monospace;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+#matrixCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.35;pointer-events:none}
+.gd{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;background-image:linear-gradient(rgba(0,255,65,0.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,255,65,0.03)1px,transparent 1px);background-size:40px 40px}
+.sl{position:fixed;left:0;width:100%;height:2px;z-index:2;pointer-events:none;background:linear-gradient(90deg,transparent,var(--grn),transparent);animation:sd 4s linear infinite;opacity:0.3}
+@keyframes sd{0%{top:-2px}100%{top:100%}}
+@keyframes pl{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes fi{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes gw{0%,100%{text-shadow:0 0 5px var(--grn),0 0 10px var(--grn)}50%{text-shadow:0 0 10px var(--grn),0 0 20px var(--grn),0 0 30px var(--grn)}}
+@keyframes wh{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes pr{from{width:0%}}
+@keyframes to{0%{opacity:0;transform:translateY(-10px)}15%{opacity:1;transform:translateY(0)}85%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-10px)}}
+.container{position:relative;z-index:10;max-width:1200px;margin:0 auto;padding:20px 16px 60px}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border:1px solid var(--border);background:rgba(0,255,65,0.02);flex-wrap:wrap;gap:10px}
+.hdr-label{font-size:9px;color:var(--grn);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:6px}
+.hdr-dot{width:5px;height:5px;border-radius:50%;background:var(--grn);animation:pl 2s ease-in-out infinite}
+.hdr-title{font-size:16px;font-weight:700;background:linear-gradient(135deg,var(--grn),var(--cy));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:2px}
+.hdr-sub{font-size:10px;color:var(--grn);opacity:0.7}
+.hdr-stats{display:flex;gap:16px}
+.hdr-stat{text-align:center}
+.hdr-stat-n{font-size:18px;font-weight:700;color:var(--cy)}
+.hdr-stat-l{font-size:9px;color:var(--grn);text-transform:uppercase;letter-spacing:1px}
+.tabs{display:flex;gap:2px;margin:20px 0 16px;flex-wrap:wrap;border-bottom:1px solid var(--border)}
+.tab{background:transparent;border:none;color:var(--dim);font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;padding:10px 16px;cursor:pointer;transition:all 0.3s;border-bottom:2px solid transparent}
+.tab:hover{color:var(--text);background:rgba(0,255,65,0.03)}
+.tab.act{color:var(--grn);border-bottom-color:var(--grn);text-shadow:0 0 10px rgba(0,255,65,0.3)}
+.tc{display:none;animation:fi 0.4s ease}
+.tc.act{display:block}
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:16px}
+.cd{background:var(--card);border:1px solid var(--border);padding:16px;transition:all 0.3s;position:relative;overflow:hidden}
+.cd:hover{border-color:rgba(0,255,65,0.2);transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.3)}
+.cd::before{content:"";position:absolute;top:0;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--grn),transparent);opacity:0;transition:opacity 0.3s}
+.cd:hover::before{opacity:1}
+.cd-icon{font-size:22px;margin-bottom:8px}
+.cd-tt{font-size:9px;color:var(--grn);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+.cd-vl{font-size:24px;font-weight:700;color:var(--cy);letter-spacing:1px}
+.cd-sub{font-size:9px;color:var(--dim);margin-top:2px}
+.cd-gr .cd-vl{color:var(--grn)}
+.cd-go .cd-vl{color:var(--go)}
+.cd-rd .cd-vl{color:var(--rd)}
+.cd-lg{grid-column:span 2}
+.sec-tt{font-size:12px;color:var(--cy);text-transform:uppercase;letter-spacing:2px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.dr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px}
+.dr:last-child{border-bottom:none}
+.dr .lb{color:var(--dim);letter-spacing:1px}
+.dr .vl{color:var(--text);text-align:right}
+.pb{height:6px;background:rgba(0,255,65,0.08);border-radius:0;margin:8px 0;overflow:hidden}
+.pb-b{height:100%;background:linear-gradient(90deg,var(--grn),var(--cy));border-radius:0;transition:width 1.5s ease}
+.dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.dc{padding:20px;background:var(--card);border:1px solid var(--border);position:relative}
+.dc-lock{opacity:0.5;filter:blur(2px);pointer-events:none;position:relative}
+.dc-lock-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,8,0.7);backdrop-filter:blur(2px);border:1px solid var(--go)}
+.dc-lock-overlay .lock-icon{font-size:32px;margin-bottom:8px}
+.dc-lock-overlay .lock-tt{font-size:11px;color:var(--go);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
+.dc-lock-overlay .lock-d{font-size:10px;color:var(--dim);text-align:center;padding:0 20px}
+.bt{display:inline-block;padding:8px 20px;border:1px solid var(--border);color:var(--grn);text-decoration:none;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all 0.3s;background:transparent;font-family:"Courier New",monospace;margin-top:8px}
+.bt:hover{border-color:var(--grn);color:var(--grn);background:rgba(0,255,65,0.05)}
+.bt-gr{background:var(--grn);color:#000;border-color:var(--grn);font-weight:600}
+.bt-gr:hover{background:rgba(0,255,65,0.8);color:#000}
+.bt-go{border-color:var(--go);color:var(--go)}
+.bt-go:hover{background:rgba(245,158,11,0.1);color:var(--go)}
+.bt-cy{border-color:var(--cy);color:var(--cy)}
+.bt-cy:hover{background:rgba(0,240,255,0.1);color:var(--cy)}
+.bg{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:9px;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(0,255,65,0.15);color:var(--grn)}
+.bg-gr{border-color:rgba(16,185,129,0.2);color:#10b981}
+.bg-gr .dot{background:#10b981}
+.bg-go{border-color:rgba(245,158,11,0.2);color:var(--go)}
+.bg-go .dot{background:var(--go)}
+.bg-rd{border-color:rgba(239,68,68,0.2);color:var(--rd)}
+.bg-rd .dot{background:var(--rd)}
+.bg .dot{width:4px;height:4px;border-radius:50%;animation:pl 1.5s ease-in-out infinite}
+.mt{list-style:none}
+.mt li{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px}
+.mt li:last-child{border-bottom:none}
+.mt .na{color:var(--text)}
+.mt .ro{font-size:9px;color:var(--dim);text-transform:uppercase;margin-top:2px}
+.mt .ba{display:flex;align-items:center;gap:8px}
+.mt .tk{color:var(--cy);font-weight:600;font-size:11px}
+.mt .pc{font-size:9px;color:var(--grn)}
+.ft{margin-top:40px;padding:16px 0;border-top:1px solid var(--border);text-align:center;font-size:9px;color:var(--dim);letter-spacing:1px}
+.inp{background:transparent;border:1px solid var(--border);color:var(--text);font-family:"Courier New",monospace;padding:6px 10px;font-size:11px;width:100%;transition:border-color 0.3s}
+.inp:focus{border-color:var(--grn);outline:none}
+#notif{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;padding:10px 24px;font-size:10px;letter-spacing:1px;border:1px solid var(--border);background:var(--card);color:var(--grn);display:none;animation:to 3s ease forwards;pointer-events:none}
+#notif.show{display:block}
+@media(max-width:768px){.container{padding:12px}.hdr{flex-direction:column;text-align:center}.hdr-stats{gap:12px}.cd-lg{grid-column:span 1}.dl{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<canvas id="matrixCanvas"></canvas>
+<div class="gd"></div>
+<div class="sl"></div>
+
+<div class="container">
+
+<!-- HEADER -->
+<header class="hdr">
+<div>
+<div class="hdr-label"><span class="hdr-dot"></span> PROYECTO INFINITO</div>
+<div class="hdr-title">🚀 Centro de Mando Familiar</div>
+<div class="hdr-sub">Tokenizaci&oacute;n &middot; MEV &middot; SEO &middot; Treasury</div>
+</div>
+<div class="hdr-stats">
+<div class="hdr-stat"><div class="hdr-stat-n" id="hdr-tokens">0</div><div class="hdr-stat-l">TI Tokens</div></div>
+<div class="hdr-stat"><div class="hdr-stat-n" id="hdr-whales">0</div><div class="hdr-stat-l">Ballenas</div></div>
+<div class="hdr-stat"><div class="hdr-stat-n" id="hdr-value">$0</div><div class="hdr-stat-l">Valor</div></div>
+<div class="bg bg-gr"><span class="dot"></span>Sistema Activo</div>
+</div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+<button class="tab act" data-tab="tab-dashboard">📊 DASHBOARD</button>
+<button class="tab" data-tab="tab-whales">🐋 WHALE RADAR</button>
+<button class="tab" data-tab="tab-staking">🔒 CONTENT LOCKER</button>
+<button class="tab" data-tab="tab-governance">🗳️ GOBERNANZA</button>
+<button class="tab" data-tab="tab-wallet">🦊 WALLET</button>
+</div>
+
+<!-- TAB 1: DASHBOARD -->
+<div class="tc act" id="tab-dashboard">
+<div class="sec-tt">📊 Panorama General</div>
+<div class="cg">
+<div class="cd cd-gr"><div class="cd-icon">🏠</div><div class="cd-tt">Propiedad</div><div class="cd-vl">$103,000 USD</div><div class="cd-sub">Calle Activo 20-30, #23 &middot; Villa Faro</div></div>
+<div class="cd"><div class="cd-icon">🪙</div><div class="cd-tt">Supply Total</div><div class="cd-vl">1,000,000 TI</div><div class="cd-sub">Tokens Infinito</div></div>
+<div class="cd cd-go"><div class="cd-icon">💰</div><div class="cd-tt">Tesorer&iacute;a DAO</div><div class="cd-vl" id="dash-treasury">$0.00</div><div class="cd-sub">Fondo de crecimiento</div></div>
+<div class="cd cd-gr"><div class="cd-icon">📈</div><div class="cd-tt">Ingreso Mensual Est.</div><div class="cd-vl" id="dash-monthly">$0.00</div><div class="cd-sub">SEO + MEV + Flash Loans</div></div>
+</div>
+
+<div class="sec-tt">👑 Distribuci&oacute;n de Tokens</div>
+<div class="cg">
+<div class="cd"><div class="cd-icon">👑</div><div class="cd-tt">Padres (Vitalicio)</div><div class="cd-vl">510,000 TI</div><div class="cd-sub">51% &middot; Ram&oacute;n &amp; Nicolasa</div><div class="pb"><div class="pb-b" style="width:51%"></div></div></div>
+<div class="cd cd-go"><div class="cd-icon">🃏</div><div class="cd-tt">Joker (Arquitecto)</div><div class="cd-vl">350,000 TI</div><div class="cd-sub">35% &middot; Romny &middot; 65% en vesting</div><div class="pb"><div class="pb-b" style="width:35%"></div></div></div>
+<div class="cd"><div class="cd-icon">🌊</div><div class="cd-tt">Pool de Herederos</div><div class="cd-vl">140,000 TI</div><div class="cd-sub">14% &middot; Reymond, Joohan, Charina...</div><div class="pb"><div class="pb-b" style="width:14%"></div></div></div>
+</div>
+
+<div class="sec-tt">👥 Miembros de la Familia</div>
+<ul class="mt">
+<li><div><div class="na">👑 Ram&oacute;n &amp; Nicolasa (Padres)</div><div class="ro">Due&ntilde;os Vitalicios</div></div><div class="ba"><span class="tk">510,000 TI</span><span class="pc">(51%)</span></div></li>
+<li><div><div class="na">🃏 Romny (Joker)</div><div class="ro">Arquitecto del Sistema</div></div><div class="ba"><span class="tk">350,000 TI</span><span class="pc">(35%)</span></div></li>
+<li><div><div class="na">👤 Reymond</div><div class="ro">Hermano Mediano</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
+<li><div><div class="na">👤 Joohan</div><div class="ro">Hermano Menor</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
+<li><div><div class="na">👤 Charina</div><div class="ro">Hermana (Padre)</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
+<li><div><div class="na">👤 Aisaack &middot; Eseck &middot; Osock</div><div class="ro">Hijos</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
+</ul>
+
+<div class="sec-tt">📈 Proyecci&oacute;n de Crecimiento</div>
+<div class="cg">
+<div class="cd cd-lg" style="overflow-x:auto">
+<table style="width:100%;font-size:11px;border-collapse:collapse;min-width:400px">
+<thead><tr style="color:var(--cy);text-transform:uppercase;font-size:9px;letter-spacing:1px">
+<th style="padding:4px 8px;text-align:left">Per&iacute;odo</th>
+<th style="padding:4px 8px;text-align:right">SEO</th>
+<th style="padding:4px 8px;text-align:right">MEV</th>
+<th style="padding:4px 8px;text-align:right">Total</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:4px 8px;color:var(--dim)">Mes 1-3</td><td style="padding:4px 8px;text-align:right;color:var(--grn)">$5K-$30K</td><td style="padding:4px 8px;text-align:right;color:var(--go)">$0-$20K</td><td style="padding:4px 8px;text-align:right;color:var(--cy)">$5K-$50K</td></tr>
+<tr><td style="padding:4px 8px;color:var(--dim)">Mes 4-6</td><td style="padding:4px 8px;text-align:right;color:var(--grn)">$40K-$100K</td><td style="padding:4px 8px;text-align:right;color:var(--go)">$20K-$100K</td><td style="padding:4px 8px;text-align:right;color:var(--cy)">$60K-$200K</td></tr>
+<tr><td style="padding:4px 8px;color:var(--dim)">A&ntilde;o 1</td><td style="padding:4px 8px;text-align:right;color:var(--grn)">$200K-$780K</td><td style="padding:4px 8px;text-align:right;color:var(--go)">$100K-$500K</td><td style="padding:4px 8px;text-align:right;color:var(--cy);font-weight:700">$300K-$1.28M</td></tr>
+<tr><td style="padding:4px 8px;color:var(--dim)">A&ntilde;o 2</td><td style="padding:4px 8px;text-align:right;color:var(--grn)">$500K-$1.5M</td><td style="padding:4px 8px;text-align:right;color:var(--go)">$300K-$1M</td><td style="padding:4px 8px;text-align:right;color:var(--cy);font-weight:700">$800K-$2.5M</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- TAB 2: WHALE RADAR -->
+<div class="tc" id="tab-whales">
+<div class="sec-tt">🐋 Radar de Ballenas &mdash; Mempool de Polygon</div>
+<div class="cg">
+<div class="cd cd-gr"><div class="cd-icon">🐟</div><div class="cd-tt">Juveniles</div><div class="cd-vl" id="whale-juvenil">0</div><div class="cd-sub">$5K &mdash; $50K</div></div>
+<div class="cd"><div class="cd-icon">🐋</div><div class="cd-tt">Azules</div><div class="cd-vl" id="whale-azul">0</div><div class="cd-sub">$50K &mdash; $250K</div></div>
+<div class="cd cd-go"><div class="cd-icon">🐋✨</div><div class="cd-tt">Doradas</div><div class="cd-vl" id="whale-dorada">0</div><div class="cd-sub">$250K &mdash; $1M</div></div>
+<div class="cd cd-go"><div class="cd-icon">🐋💎</div><div class="cd-tt">M&iacute;ticas</div><div class="cd-vl" id="whale-mitica">0</div><div class="cd-sub">$1M+</div></div>
+</div>
+
+<div class="sec-tt">📡 Transacciones en Tiempo Real</div>
+<div id="whale-feed" style="background:var(--card);border:1px solid var(--border);padding:16px;max-height:400px;overflow-y:auto">
+<div style="text-align:center;padding:30px;color:var(--dim);font-size:11px">
+⏳ Escaneando mempool...<br>
+<span style="font-size:9px">Conecta con MetaMask para datos en vivo</span>
+</div>
+</div>
+
+<div class="sec-tt">💎 Oportunidades de Flash Loan</div>
+<div class="dl" id="flash-opps">
+<div class="dc">
+<div class="dc-lock-overlay">
+<div class="lock-icon">🔒</div>
+<div class="lock-tt">Content Locker</div>
+<div class="lock-d">Stakea tus tokens TI para ver oportunidades de arbitraje en tiempo real</div>
+<button class="bt bt-go" onclick="switchTab('tab-staking')">Ir a Staking</button>
+</div>
+<div class="dc-lock">
+<div class="cd-icon">💎</div>
+<div class="cd-tt" style="margin-top:6px">Ballena Dorada Detectada</div>
+<div class="cd-vl" style="font-size:16px">$420,690 USD</div>
+<div style="font-size:10px;color:var(--dim);margin-top:4px">Profit Est.: $8,413 &middot; ROI: 323% &middot; Riesgo: BAJO</div>
+</div>
+</div>
+<div class="dc">
+<div class="dc-lock-overlay">
+<div class="lock-icon">🔒</div>
+<div class="lock-tt">Bloqueado</div>
+<div class="lock-d">Conecta y stakea para desbloquear</div>
+</div>
+<div class="dc-lock">
+<div class="cd-icon">💎</div>
+<div class="cd-tt" style="margin-top:6px">Ballena Azul Detectada</div>
+<div class="cd-vl" style="font-size:16px">$184,500 USD</div>
+<div style="font-size:10px;color:var(--dim);margin-top:4px">Profit Est.: $4,153 &middot; ROI: 265% &middot; Riesgo: MEDIO</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- TAB 3: CONTENT LOCKER -->
+<div class="tc" id="tab-staking">
+<div class="sec-tt">🔒 Content Locker &mdash; Staking de Tokens</div>
+<div class="cg">
+<div class="cd cd-gr"><div class="cd-icon">🪙</div><div class="cd-tt">Tus Tokens</div><div class="cd-vl" id="stake-balance">0 TI</div><div class="cd-sub">Conecta tu wallet</div></div>
+<div class="cd cd-go"><div class="cd-icon">🔒</div><div class="cd-tt">Tokens Stakados</div><div class="cd-vl" id="stake-locked">0 TI</div><div class="cd-sub">Gana acceso a contenido premium</div></div>
+<div class="cd"><div class="cd-icon">🎁</div><div class="cd-tt">Dividendos Pendientes</div><div class="cd-vl" id="stake-dividends">$0.00</div><div class="cd-sub">Reclama cuando quieras</div></div>
+</div>
+
+<div class="cg">
+<div class="cd cd-lg">
+<div class="cd-tt">¿Cu&aacute;nto quieres stakeaer?</div>
+<div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap">
+<input class="inp" type="number" id="stake-amount" placeholder="Cantidad de TI..." style="flex:1;min-width:150px">
+<button class="bt bt-gr" onclick="stakeTokens()">🔒 Stakear</button>
+<button class="bt bt-cy" onclick="unstakeTokens()">🔓 Unstakear</button>
+</div>
+
+<div class="sec-tt" style="margin-top:20px;font-size:10px">🎯 Contenido Desbloqueado por Staking</div>
+<div class="dl">
+<div class="dc">
+<div class="cd-icon">🐋</div>
+<div class="cd-tt" style="margin-top:6px">Whale Tracker Premium</div>
+<div style="font-size:10px;color:var(--dim);margin:6px 0">Accede a datos de ballenas en tiempo real con estrategias de arbitraje.</div>
+<div class="bg bg-go"><span class="dot"></span>Requiere 1,000 TI stakados</div>
+</div>
+<div class="dc">
+<div class="cd-icon">📊</div>
+<div class="cd-tt" style="margin-top:6px">SEO Yield Dashboard</div>
+<div style="font-size:10px;color:var(--dim);margin:6px 0">Ve los ingresos SEO por nicho, CPC, y tr&aacute;fico en tiempo real.</div>
+<div class="bg bg-go"><span class="dot"></span>Requiere 5,000 TI stakados</div>
+</div>
+<div class="dc">
+<div class="cd-icon">🗳️</div>
+<div class="cd-tt" style="margin-top:6px">Votaci&oacute;n de Gobernanza</div>
+<div style="font-size:10px;color:var(--dim);margin:6px 0">Participa en decisiones del DAO: mejoras, distribuciones, inversiones.</div>
+<div class="bg bg-gr"><span class="dot"></span>Requiere 10,000 TI stakados</div>
+</div>
+<div class="dc">
+<div class="cd-icon">🤝</div>
+<div class="cd-tt" style="margin-top:6px">Airdrops Prioritarios</div>
+<div style="font-size:10px;color:var(--dim);margin:6px 0">Recibe airdrops de ballenas cazadas antes que los no-stakers.</div>
+<div class="bg bg-go"><span class="dot"></span>Requiere 25,000 TI stakados</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- TAB 4: GOBERNANZA -->
+<div class="tc" id="tab-governance">
+<div class="sec-tt">🗳️ Gobernanza &mdash; Votaci&oacute;n Familiar</div>
+<div class="cg">
+<div class="cd cd-gr"><div class="cd-icon">👑</div><div class="cd-tt">Padres</div><div class="cd-vl">51%</div><div class="cd-sub">Poder de veto</div></div>
+<div class="cd"><div class="cd-icon">🃏</div><div class="cd-tt">Joker</div><div class="cd-vl">35%</div><div class="cd-sub">Control de protocolo</div></div>
+<div class="cd cd-go"><div class="cd-icon">🌊</div><div class="cd-tt">Pool Familiar</div><div class="cd-vl">14%</div><div class="cd-sub">Voto ponderado por tokens</div></div>
+</div>
+
+<div class="sec-tt">📋 Propuestas Activas</div>
+<div id="proposals">
+<div class="cd" style="margin-bottom:10px" id="prop1">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+<div>
+<div style="font-size:11px;color:var(--cy);font-weight:600;margin-bottom:4px">PIP-1: Inversi&oacute;n en Construcci&oacute;n de Segundo Nivel</div>
+<div style="font-size:10px;color:var(--dim)">Propone invertir $50,000 USD en techar el patio y construir habitaciones arriba. Aumenta el valor de la propiedad en ~$50K.</div>
+</div>
+<div style="text-align:center">
+<div class="bg bg-gr" style="margin-bottom:4px" id="prop1-status"><span class="dot"></span>En Votaci&oacute;n</div>
+<div style="font-size:9px;color:var(--dim)">Cierra en 7 d&iacute;as</div>
+</div>
+</div>
+<div class="pb" style="margin:12px 0"><div class="pb-b" id="prop1-bar" style="width:72%"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:10px">
+<span style="color:var(--grn)" id="prop1-yes">👍 72% a favor</span>
+<span style="color:var(--rd)" id="prop1-no">👎 28% en contra</span>
+</div>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button class="bt bt-gr" style="padding:4px 16px;font-size:10px" onclick="vote('prop1',true)">👍 Votar S&iacute;</button>
+<button class="bt" style="padding:4px 16px;font-size:10px;border-color:var(--rd);color:var(--rd)" onclick="vote('prop1',false)">👎 Votar No</button>
+</div>
+</div>
+
+<div class="cd" style="margin-bottom:10px" id="prop2">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+<div>
+<div style="font-size:11px;color:var(--cy);font-weight:600;margin-bottom:4px">PIP-2: Distribuci&oacute;n de Airdrops del Trimestre</div>
+<div style="font-size:10px;color:var(--dim)">Distribuir $25,000 USD en ganancias de MEV entre los tenedores de tokens seg&uacute;n su porcentaje.</div>
+</div>
+<div style="text-align:center">
+<div class="bg bg-go" id="prop2-status"><span class="dot"></span>Pendiente</div>
+</div>
+</div>
+<div class="pb" style="margin:12px 0"><div class="pb-b" id="prop2-bar" style="width:0%"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:10px">
+<span style="color:var(--grn)" id="prop2-yes">👍 0% a favor</span>
+<span style="color:var(--rd)" id="prop2-no">👎 0% en contra</span>
+</div>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button class="bt bt-gr" style="padding:4px 16px;font-size:10px" onclick="vote('prop2',true)">👍 Votar S&iacute;</button>
+<button class="bt" style="padding:4px 16px;font-size:10px;border-color:var(--rd);color:var(--rd)" onclick="vote('prop2',false)">👎 Votar No</button>
+</div>
+</div>
+
+<div class="cd" id="prop3">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+<div>
+<div style="font-size:11px;color:var(--cy);font-weight:600;margin-bottom:4px">PIP-3: Compra de VPS AlexHost para Infraestructura 24/7</div>
+<div style="font-size:10px;color:var(--dim)">$1,200/a&ntilde;o para servidor dedicado que mantenga los bots MEV, SEO Oracle y DApp operativos 24/7.</div>
+</div>
+<div style="text-align:center">
+<div class="bg bg-gr" style="margin-bottom:4px" id="prop3-status"><span class="dot"></span>En Votaci&oacute;n</div>
+</div>
+</div>
+<div class="pb" style="margin:12px 0"><div class="pb-b" id="prop3-bar" style="width:89%"></div></div>
+<div style="display:flex;justify-content:space-between;font-size:10px">
+<span style="color:var(--grn)" id="prop3-yes">👍 89% a favor</span>
+<span style="color:var(--rd)" id="prop3-no">👎 11% en contra</span>
+</div>
+<div style="display:flex;gap:8px;margin-top:10px">
+<button class="bt bt-gr" style="padding:4px 16px;font-size:10px" onclick="vote('prop3',true)">👍 Votar S&iacute;</button>
+<button class="bt" style="padding:4px 16px;font-size:10px;border-color:var(--rd);color:var(--rd)" onclick="vote('prop3',false)">👎 Votar No</button>
+</div>
+</div>
+</div>
+
+<div class="sec-tt">📊 Historial de Votaciones</div>
+<div class="cd" style="font-size:10px">
+<div class="dr"><span class="lb">PIP-0: Creaci&oacute;n del DAO</span><span class="vl" style="color:var(--grn)">✅ Aprobado 100%</span></div>
+<div class="dr"><span class="lb">PIP-0: Distribuci&oacute;n Inicial de Tokens</span><span class="vl" style="color:var(--grn)">✅ Aprobado 100%</span></div>
+<div class="dr"><span class="lb">PIP-0: Configuraci&oacute;n de Whale Watcher</span><span class="vl" style="color:var(--grn)">✅ Aprobado 100%</span></div>
+</div>
+</div>
+
+<!-- TAB 5: WALLET -->
+<div class="tc" id="tab-wallet">
+<div class="sec-tt">🦊 Conexi&oacute;n de Wallet</div>
+<div class="cg">
+<div class="cd cd-lg">
+<div style="text-align:center;padding:20px 0">
+<div id="wallet-status" style="font-size:12px;color:var(--dim);margin-bottom:12px">⛔ No conectado</div>
+<div id="wallet-address" style="font-size:10px;color:var(--cy);font-family:monospace;word-break:break-all;margin-bottom:10px;display:none"></div>
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+<button class="bt bt-gr" onclick="connectWallet()" id="wallet-btn">🔌 Conectar MetaMask</button>
+<button class="bt bt-cy" onclick="disconnectWallet()" id="wallet-disconnect" style="display:none">🔌 Desconectar</button>
+</div>
+<div id="wallet-info" style="margin-top:16px;display:none">
+<div class="dr"><span class="lb">Red</span><span class="vl" id="wallet-network">&mdash;</span></div>
+<div class="dr"><span class="lb">Balance MATIC</span><span class="vl" id="wallet-matic">&mdash;</span></div>
+<div class="dr"><span class="lb">Tokens TI</span><span class="vl" id="wallet-ti">&mdash;</span></div>
+<div class="dr"><span class="lb">Dividendos Pendientes</span><span class="vl" id="wallet-divs" style="color:var(--grn)">&mdash;</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer class="ft">
+<strong>PROYECTO INFINITO</strong> &mdash; Tokenizaci&oacute;n &middot; MEV &middot; SEO &middot; Treasury<br>
+Calle Activo 20-30, #23 &middot; Capotillo, Villa Faro &middot; Santo Domingo Este, RD<br>
+Construido con Buffy &middot; Codebuff AI &middot; V1.0 &middot; Junio 2026
+</footer>
+
+</div>
+
+<!-- NOTIFICATION -->
+<div id="notif"></div>
+
+<script>
+var MAX_BALANCE = 100000;
+var staked = 0;
+var whaleInterval = null;
+var clockInterval = null;
+
+// ─── NOTIFICATION ───
+function showNotif(msg, color) {
+  var n = document.getElementById("notif");
+  n.textContent = msg;
+  n.style.borderColor = color || "var(--border)";
+  n.style.color = color || "var(--grn)";
+  n.className = "show";
+  setTimeout(function(){ n.className = ""; }, 3000);
+}
+
+// ─── MATRIX RAIN ───
+(function(){
+var c=document.getElementById("matrixCanvas"),ctx=c.getContext("2d");
+var W,H;
+function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+resize();window.onresize=resize;
+var cols=Math.floor(W/12),drops=Array(cols).fill(1).map(function(){return Math.random()*-80});
+function draw(){
+ctx.fillStyle="rgba(5,5,8,0.045)";ctx.fillRect(0,0,W,H);
+ctx.fillStyle="#00ff41";ctx.font="10px monospace";
+ctx.shadowColor="#00ff41";ctx.shadowBlur=4;
+for(var i=0;i<cols;i++){
+var x=i*12,y=drops[i]*10,char=String.fromCharCode(0x30A0+Math.random()*96);
+if(y>0&&y<H){ctx.fillStyle=y<80?"rgba(0,255,65,0.95)":"rgba(0,255,65,0.5)";ctx.fillText(char,x,y)}
+drops[i]+=0.5+Math.random()*0.5;if(y>50&&Math.random()>0.98)drops[i]=Math.random()*-60
+}
+ctx.shadowBlur=0;requestAnimationFrame(draw)
+}
+draw()
+})();
+
+// ─── TAB SYSTEM ───
+function switchTab(tabId){
+document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("act")});
+document.querySelectorAll(".tc").forEach(function(t){t.classList.remove("act")});
+document.querySelector(".tab[data-tab='"+tabId+"']").classList.add("act");
+document.getElementById(tabId).classList.add("act");
+}
+document.querySelectorAll(".tab").forEach(function(tab){
+tab.addEventListener("click",function(){switchTab(this.dataset.tab)});
+});
+
+// ─── DASHBOARD ANIMATION (Unificada) ───
+function animateDashboard(){
+var targets=[
+{el:"hdr-tokens",val:1000000,fmt:function(v){return v.toLocaleString()+" TI"}},
+{el:"hdr-whales",val:99,fmt:function(v){return v}},
+{el:"hdr-value",val:103000,fmt:function(v){return "$"+v.toLocaleString()}},
+{el:"dash-treasury",val:42600,fmt:function(v){return "$"+v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}},
+{el:"dash-monthly",val:293150,fmt:function(v){return "$"+v.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}}
+];
+var progress = targets.map(function(){return 0});
+var step = 1;
+function tick(){
+var done = 0;
+for(var i=0;i<targets.length;i++){
+if(progress[i] >= targets[i].val){
+done++;
+continue;
+}
+progress[i] = Math.min(progress[i] + Math.ceil(targets[i].val/60), targets[i].val);
+var el = document.getElementById(targets[i].el);
+if(el) el.textContent = targets[i].fmt(progress[i]);
+}
+if(done < targets.length) requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+}
+animateDashboard();
+
+// ─── WHALE SIMULATION (Buffer circular) ───
+function initWhaleFeed(){
+var feed = document.getElementById("whale-feed");
+feed.innerHTML = "";
+for(var i=0;i<12;i++){
+var row = document.createElement("div");
+row.className = "wf-row";
+row.style.cssText = "display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:10px";
+feed.appendChild(row);
+}
+}
+function simulateWhales(){
+var cats = {
+juvenil:{count:Math.floor(Math.random()*15+5),emoji:""},
+azul:{count:Math.floor(Math.random()*10+3),emoji:""},
+dorada:{count:Math.floor(Math.random()*5+1),emoji:"✨"},
+mitica:{count:Math.floor(Math.random()*2),emoji:"💎"}
+};
+document.getElementById("whale-juvenil").textContent = cats.juvenil.count;
+document.getElementById("whale-azul").textContent = cats.azul.count;
+document.getElementById("whale-dorada").textContent = cats.dorada.count;
+document.getElementById("whale-mitica").textContent = cats.mitica.count;
+
+var addresses = ["0x7ceB...1f9","0x2791...174","0xc213...e8f","0x0d50...F3a","0x1a2b...4Cd"];
+var types = ["Juvenil","Azul","Dorada","Mitica"];
+var emojis = ["","","✨","💎"];
+var rows = document.querySelectorAll("#whale-feed .wf-row");
+for(var i=0;i<rows.length && i<12;i++){
+var type = types[Math.floor(Math.random()*types.length)];
+var baseVal = {Juvenil:20000,Azul:120000,Dorada:500000,Mitica:2000000}[type];
+var value = (baseVal + Math.random()*baseVal*0.5).toFixed(0);
+var addr = addresses[Math.floor(Math.random()*addresses.length)];
+var time = new Date(Date.now()-Math.random()*3600000).toLocaleTimeString("es",{hour:"2-digit",minute:"2-digit"});
+var conf = Math.random();
+var confColor = conf>0.7?"var(--grn)":conf>0.4?"var(--go)":"var(--rd)";
+rows[i].innerHTML =
+"<span>"+emojis[types.indexOf(type)]+" <span style='color:"+confColor+"'>"+type+"</span></span>"+
+"<span style='color:var(--cy)'>$"+Number(value).toLocaleString()+"</span>"+
+"<span style='color:var(--dim)'>"+addr+"</span>"+
+"<span style='color:var(--dim)'>"+time+"</span>"+
+"<span style='color:"+confColor+"'>"+(conf*100).toFixed(0)+"%</span>";
+}
+}
+initWhaleFeed();
+simulateWhales();
+
+// ─── PAGE VISIBILITY API ───
+function startIntervals(){
+if(!whaleInterval) whaleInterval = setInterval(simulateWhales, 8000);
+if(!clockInterval) clockInterval = setInterval(updateClock, 1000);
+}
+function stopIntervals(){
+if(whaleInterval){clearInterval(whaleInterval);whaleInterval=null;}
+if(clockInterval){clearInterval(clockInterval);clockInterval=null;}
+}
+document.addEventListener("visibilitychange", function(){
+if(document.hidden){ stopIntervals(); }
+else { startIntervals(); }
+});
+startIntervals();
+
+// ─── STAKING (Corregido) ───
+function stakeTokens(){
+var inp = document.getElementById("stake-amount");
+var amt = parseInt(inp.value);
+if(!amt||amt<=0){ showNotif("❌ Ingresa una cantidad v\u00e1lida de TI","var(--rd)"); return; }
+if(staked+amt > MAX_BALANCE){ showNotif("❌ No tienes suficientes TI. M\u00e1ximo: "+(MAX_BALANCE-staked)+" TI","var(--rd)"); return; }
+staked += amt;
+document.getElementById("stake-balance").textContent = (MAX_BALANCE-staked).toLocaleString()+" TI";
+document.getElementById("stake-locked").textContent = staked.toLocaleString()+" TI";
+inp.value = "";
+document.querySelectorAll(".dc-lock-overlay").forEach(function(o){o.style.display="none"});
+document.querySelectorAll(".dc-lock").forEach(function(c){c.style.opacity="1";c.style.filter="none";c.style.pointerEvents="auto"});
+showNotif("✅ Stakeado exitosamente! "+amt.toLocaleString()+" TI bloqueados","var(--grn)");
+}
+function unstakeTokens(){
+if(staked<=0){ showNotif("❌ No tienes tokens stakados","var(--rd)"); return; }
+var inp = document.getElementById("stake-amount");
+var amt = parseInt(inp.value);
+if(!amt||amt<=0){ showNotif("❌ Ingresa cu\u00e1ntos TI unstakear","var(--rd)"); return; }
+if(amt > staked){ showNotif("❌ Solo tienes "+staked.toLocaleString()+" TI stakados","var(--rd)"); return; }
+staked -= amt;
+document.getElementById("stake-balance").textContent = (MAX_BALANCE-staked).toLocaleString()+" TI";
+document.getElementById("stake-locked").textContent = staked.toLocaleString()+" TI";
+inp.value = "";
+if(staked <= 0){
+document.querySelectorAll(".dc-lock-overlay").forEach(function(o){o.style.display="flex"});
+document.querySelectorAll(".dc-lock").forEach(function(c){c.style.opacity="0.5";c.style.filter="blur(2px)";c.style.pointerEvents="none"});
+}
+showNotif("✅ "+amt.toLocaleString()+" TI unstakados","var(--grn)");
+}
+
+// ─── VOTING ───
+function vote(propId, isYes){
+var bar = document.getElementById(propId+"-bar");
+var yesLabel = document.getElementById(propId+"-yes");
+var noLabel = document.getElementById(propId+"-no");
+var status = document.getElementById(propId+"-status");
+var w = parseFloat(bar.style.width) || 0;
+if(isYes){
+var newW = Math.min(w + 5, 100);
+bar.style.width = newW + "%";
+yesLabel.textContent = "👍 "+newW.toFixed(0)+"% a favor";
+noLabel.textContent = "👎 "+(100-newW).toFixed(0)+"% en contra";
+status.innerHTML = "<span class='dot'></span> En Votaci\u00f3n";
+status.className = "bg bg-gr";
+showNotif("🗳️ Voto registrado: S\u00ed ("+newW.toFixed(0)+"%)","var(--cy)");
+} else {
+var newW = Math.min(w + 5, 100);
+bar.style.width = (100-newW) + "%";
+yesLabel.textContent = "👍 "+(100-newW).toFixed(0)+"% a favor";
+noLabel.textContent = "👎 "+newW.toFixed(0)+"% en contra";
+status.innerHTML = "<span class='dot'></span> En Votaci\u00f3n";
+status.className = "bg bg-gr";
+showNotif("🗳️ Voto registrado: No ("+newW.toFixed(0)+"%)","var(--rd)");
+}
+}
+
+// ─── WALLET ───
+function connectWallet(){
+if(typeof window.ethereum==="undefined"){
+document.getElementById("wallet-status").innerHTML = "<span style='color:var(--rd)'>MetaMask no instalado. <a href='https://metamask.io' target='_blank' style='color:var(--cy)'>Instalar</a></span>";
+return;
+}
+document.getElementById("wallet-status").textContent = "Conectando...";
+window.ethereum.request({method:"eth_requestAccounts"})
+.then(function(accounts){
+var addr = accounts[0];
+document.getElementById("wallet-address").textContent = addr;
+document.getElementById("wallet-address").style.display = "block";
+document.getElementById("wallet-status").textContent = "Conectado: "+addr.slice(0,6)+"..."+addr.slice(-4);
+document.getElementById("wallet-btn").textContent = "Cambiar Wallet";
+document.getElementById("wallet-disconnect").style.display = "inline-block";
+document.getElementById("wallet-info").style.display = "block";
+document.getElementById("wallet-network").textContent = "Polygon (Amoy Testnet)";
+document.getElementById("wallet-matic").textContent = (Math.random()*5+0.1).toFixed(4)+" MATIC";
+document.getElementById("wallet-ti").textContent = (Math.floor(Math.random()*50000+1000)).toLocaleString()+" TI";
+document.getElementById("wallet-divs").textContent = "$"+(Math.random()*500+10).toFixed(2);
+showNotif("🦊 Wallet conectada exitosamente","var(--cy)");
+})
+.catch(function(err){
+document.getElementById("wallet-status").innerHTML = "<span style='color:var(--rd)'>Conexi\u00f3n rechazada</span>";
+});
+}
+function disconnectWallet(){
+document.getElementById("wallet-address").style.display = "none";
+document.getElementById("wallet-status").textContent = "No conectado";
+document.getElementById("wallet-btn").textContent = "Conectar MetaMask";
+document.getElementById("wallet-disconnect").style.display = "none";
+document.getElementById("wallet-info").style.display = "none";
+}
+
+// ─── CLOCK ───
+function updateClock(){
+var d = new Date();
+var opts = {year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"};
+var el = document.querySelector(".hdr-sub");
+if(el) el.textContent = d.toLocaleDateString("es-ES",opts)+"  |  Polygon Amoy Testnet";
+}
+
+console.log("PROYECTO INFINITO — DApp Familiar Cargada");
+console.log("\"Mientras todos dormian, yo construia el futuro.\"");
+</script>
+</body>
+</html>
