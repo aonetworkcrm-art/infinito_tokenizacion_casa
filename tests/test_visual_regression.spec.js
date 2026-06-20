@@ -45,8 +45,8 @@ async function freezeAnimations(page) {
       window.clearInterval(i);
     }
 
-    // 3. Detener el Matrix Rain canvas
-    const canvas = document.getElementById("matrixCanvas");
+    // 3. Limpiar canvas de lluvia INFINITO
+    const canvas = document.getElementById("infinitoCanvas");
     if (canvas) {
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -312,6 +312,7 @@ test.describe("Sistema de Tabs — Regresión Visual", () => {
     { id: "tab-staking", name: "content-locker", selector: ".tab[data-tab='tab-staking']" },
     { id: "tab-governance", name: "governance", selector: ".tab[data-tab='tab-governance']" },
     { id: "tab-wallet", name: "wallet", selector: ".tab[data-tab='tab-wallet']" },
+    { id: "tab-shadow", name: "shadow-silo", selector: ".tab[data-tab='tab-shadow']" },
   ];
 
   for (const tab of allTabs) {

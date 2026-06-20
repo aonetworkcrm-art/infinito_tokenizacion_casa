@@ -62,14 +62,15 @@ test.describe("Header y Estado Inicial", () => {
     await expect(badge).toContainText("Sistema Activo");
   });
 
-  test("debe tener 5 tabs con labels correctos", async ({ page }) => {
+  test("debe tener 6 tabs con labels correctos", async ({ page }) => {
     const tabs = page.locator(".tab");
-    await expect(tabs).toHaveCount(5);
+    await expect(tabs).toHaveCount(6);
     await expect(tabs.nth(0)).toContainText("DASHBOARD");
     await expect(tabs.nth(1)).toContainText("WHALE RADAR");
     await expect(tabs.nth(2)).toContainText("CONTENT LOCKER");
     await expect(tabs.nth(3)).toContainText("GOBERNANZA");
     await expect(tabs.nth(4)).toContainText("WALLET");
+    await expect(tabs.nth(5)).toContainText("SHADOW SILO");
   });
 
   test("debe mostrar el footer con créditos", async ({ page }) => {
@@ -126,14 +127,14 @@ test.describe("Sistema de Tabs", () => {
   });
 
   test("debe permitir navegar entre todos los tabs", async ({ page }) => {
-    for (const tabId of ["tab-dashboard", "tab-whales", "tab-staking", "tab-governance", "tab-wallet"]) {
+    for (const tabId of ["tab-dashboard", "tab-whales", "tab-staking", "tab-governance", "tab-wallet", "tab-shadow"]) {
       await page.locator(`.tab[data-tab='${tabId}']`).click();
       await expect(page.locator(`#${tabId}`)).toHaveClass(/act/);
     }
   });
 
   test("solo un tab debe estar activo a la vez", async ({ page }) => {
-    for (const tabId of ["tab-whales", "tab-staking", "tab-governance"]) {
+    for (const tabId of ["tab-whales", "tab-staking", "tab-governance", "tab-shadow"]) {
       await page.locator(`.tab[data-tab='${tabId}']`).click();
       await expect(page.locator(".tc.act")).toHaveCount(1);
     }
@@ -326,8 +327,8 @@ test.describe("Dashboard y UI", () => {
     await expect(page.locator(".cd:has-text('140,000 TI')")).toBeVisible();
   });
 
-  test("debe mostrar los 6 miembros de la familia", async ({ page }) => {
-    await expect(page.locator(".mt li")).toHaveCount(6);
+  test("debe mostrar los 9 miembros de la familia", async ({ page }) => {
+    await expect(page.locator(".mt li")).toHaveCount(9);
     await expect(page.locator(".mt li").first()).toContainText("Ramón & Nicolasa");
   });
 

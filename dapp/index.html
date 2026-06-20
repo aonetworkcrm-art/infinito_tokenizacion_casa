@@ -8,7 +8,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0f0a06;--grn:#2d8a4e;--cy:#0891b2;--go:#b45309;--rd:#dc2626;--pu:#6d28d9;--text:#d4d4d8;--dim:#78716c;--card:#1c1917;--border:rgba(45,138,78,0.10)}
 body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
-#infinitoCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.18;pointer-events:none}
+#infinitoCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:0.2;pointer-events:none}
 @keyframes pl{0%,100%{opacity:1}50%{opacity:0.3}}
 @keyframes fi{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pr{from{width:0%}}
@@ -116,6 +116,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 <button class="tab" data-tab="tab-staking">🔒 CONTENT LOCKER</button>
 <button class="tab" data-tab="tab-governance">🗳️ GOBERNANZA</button>
 <button class="tab" data-tab="tab-wallet">🦊 WALLET</button>
+<button class="tab" data-tab="tab-shadow">🌑 SHADOW SILO</button>
 </div>
 
 <!-- TAB 1: DASHBOARD -->
@@ -142,8 +143,27 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 <li><div><div class="na">👤 Reymond</div><div class="ro">Hermano Mediano</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
 <li><div><div class="na">👤 Joohan</div><div class="ro">Hermano Menor</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
 <li><div><div class="na">👤 Charina</div><div class="ro">Hermana (Padre)</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
-<li><div><div class="na">👤 Aisaack &middot; Eseck &middot; Osock</div><div class="ro">Hijos</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
+<li><div><div class="na">👤 Aisaack</div><div class="ro">Hijo &middot; 14 a&ntilde;os</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
+<li><div><div class="na">👤 Eseck Abiel</div><div class="ro">Hijo</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
+<li><div><div class="na">👤 Osock</div><div class="ro">Hijo</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
+<li><div><div class="na">👤 Judelkis</div><div class="ro">Sobrina / Prima (criada por pap&aacute;)</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
 </ul>
+
+<div class="sec-tt">🏥 Salud de la Familia</div>
+<div class="cg">
+<div class="cd cd-rd"><div class="cd-icon">❤️</div><div class="cd-tt">Nicolasa (Madre)</div><div class="cd-vl" style="font-size:16px">Columna rota en 3 partes</div><div class="cd-sub">Inyecciones diarias &middot; 60 a&ntilde;os &middot; Prioridad M&aacute;xima</div></div>
+<div class="cd cd-go"><div class="cd-icon">💉</div><div class="cd-tt">Tratamiento</div><div class="cd-vl" style="font-size:16px">Inyecciones diarias</div><div class="cd-sub">Requiere cama c&oacute;moda, A/C, y espacio ordenado</div></div>
+<div class="cd cd-gr"><div class="cd-icon">🛌</div><div class="cd-tt">Meta Inmediata</div><div class="cd-vl" style="font-size:16px">Hab. Ordenada + A/C</div><div class="cd-sub">Eliminar ropa innecesaria, control de temperatura, descanso digno</div></div>
+<div class="cd cd-gr"><div class="cd-icon">👑</div><div class="cd-tt">Ram&oacute;n (Padre)</div><div class="cd-vl" style="font-size:16px">~70 a&ntilde;os</div><div class="cd-sub">Pastor &middot; Due&ntilde;o vitalicio &middot; Casa en Villa Faro <span class="bg bg-gr" style="margin-left:4px"><span class="dot"></span>Saludable</span></div></div>
+</div>
+
+<div class="sec-tt">💡 CT — Control El&eacute;ctrico</div>
+<div class="cg">
+<div class="cd cd-rd"><div class="cd-icon">⚡</div><div class="cd-tt">Deuda Actual</div><div class="cd-vl">RD$4,000</div><div class="cd-sub">Energ&iacute;a el&eacute;ctrica &middot; Pendiente</div><div class="pb"><div class="pb-b" style="width:40%;background:var(--rd)"></div></div></div>
+<div class="cd cd-go"><div class="cd-icon">💡</div><div class="cd-tt">Bombillos en Casa</div><div class="cd-vl" style="color:var(--go)">9</div><div class="cd-sub">Hab. viejos, sala(2), cocina, markesina, hab. Romny, ba&ntilde;o, exterior &middot; <strong style="color:var(--cy)">Meta: Pasar a LED</strong></div></div>
+<div class="cd"><div class="cd-icon">❄️</div><div class="cd-tt">Consumidores</div><div class="cd-vl">2 Neveras + 1 A/C</div><div class="cd-sub">+ abanicos, TV, PC, dom&oacute;tica Reymond</div></div>
+<div class="cd cd-gr"><div class="cd-icon">📊</div><div class="cd-tt">Ahorro Proyectado</div><div class="cd-vl" style="color:var(--grn);font-size:18px">~30%</div><div class="cd-sub">Con LED + medici&oacute;n inteligente vía ESP32</div></div>
+</div>
 
 <div class="sec-tt">📈 Proyecci&oacute;n de Crecimiento</div>
 <div class="cg">
@@ -349,6 +369,61 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 </div>
 </div>
 
+<!-- TAB 6: SHADOW SILO -->
+<div class="tc" id="tab-shadow">
+<div class="sec-tt">🌑 Shadow Silo &mdash; Publicaciones &amp; SEO</div>
+<div class="cg">
+<div class="cd cd-gr"><div class="cd-icon">📝</div><div class="cd-tt">Posts Activos</div><div class="cd-vl" id="shadow-posts">5</div><div class="cd-sub">Nodos evergreen desplegados</div></div>
+<div class="cd"><div class="cd-icon">🔍</div><div class="cd-tt">Palabras Clave Seguidas</div><div class="cd-vl" id="shadow-keywords">12</div><div class="cd-sub">CPC &ge; $100 USD &middot; Oro puro</div></div>
+<div class="cd cd-go"><div class="cd-icon">📈</div><div class="cd-tt">Tr&aacute;fico Estimado</div><div class="cd-vl" id="shadow-traffic">0</div><div class="cd-sub">Visitas/mes &middot; 2% CTR &rarr; $</div></div>
+<div class="cd"><div class="cd-icon">💰</div><div class="cd-tt">Yield Estimado</div><div class="cd-vl" style="color:var(--go)" id="shadow-yield">$0.00</div><div class="cd-sub">CPC &times; CTR &times; Tr&aacute;fico</div></div>
+</div>
+
+<div class="sec-tt">📄 Contenido Generado</div>
+<div class="cd" style="margin-bottom:10px">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div>
+<div style="font-size:11px;color:var(--cy);font-weight:600">🏛️ Gu&iacute;a Legal: Abogado de Accidentes</div>
+<div style="font-size:10px;color:var(--dim);margin-top:4px">CPC: $130 &middot; Tr&aacute;fico Est.: 2,000/mes &middot; Publicado en GitHub Pages</div>
+</div>
+<div class="bg bg-gr"><span class="dot"></span>Indexado</div>
+</div>
+</div>
+
+<div class="cd" style="margin-bottom:10px">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div>
+<div style="font-size:11px;color:var(--cy);font-weight:600">🚛 Calculadora de Indemnizaci&oacute;n</div>
+<div style="font-size:10px;color:var(--dim);margin-top:4px">CPC: $110 &middot; Tr&aacute;fico Est.: 1,500/mes &middot; Nicho legal</div>
+</div>
+<div class="bg bg-gr"><span class="dot"></span>Indexado</div>
+</div>
+</div>
+
+<div class="cd" style="margin-bottom:10px">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+<div>
+<div style="font-size:11px;color:var(--cy);font-weight:600">🔐 Seguridad DeFi y Staking Avanzado</div>
+<div style="font-size:10px;color:var(--dim);margin-top:4px">CPC: $135 &middot; Tr&aacute;fico Est.: 3,500/mes &middot; Nicho financiero</div>
+</div>
+<div class="bg bg-go"><span class="dot"></span>En Cola</div>
+</div>
+</div>
+
+<div class="sec-tt">🔄 Indexaci&oacute;n Autom&aacute;tica</div>
+<div class="cg">
+<div class="cd cd-lg">
+<div class="cd-tt">Pr&oacute;ximo Post Programado</div>
+<div id="shadow-queue" style="font-size:11px;padding:8px 0">
+<div class="dr"><span class="lb">🔷 Nicho: Recuperaci&oacute;n de Activos</span><span class="vl" style="color:var(--cy)">CPC: $150+</span></div>
+<div class="dr"><span class="lb">🔷 Nicho: Infraestructura Cloud</span><span class="vl" style="color:var(--cy)">CPC: $110+</span></div>
+<div class="dr"><span class="lb">📊 Total Colecci&oacute;n</span><span class="vl" style="color:var(--grn)">5 nodos activos + 2 en cola</span></div>
+</div>
+<button class="bt bt-gr" onclick="showNotif('🌑 Shadow Silo: Contenido encolado para publicaci&oacute;n automatizada','var(--cy)')">🌑 Generar Siguiente Post</button>
+</div>
+</div>
+</div>
+
 <!-- TAB 5: WALLET -->
 <div class="tc" id="tab-wallet">
 <div class="sec-tt">🦊 Conexi&oacute;n de Wallet</div>
@@ -412,6 +487,12 @@ document.getElementById(tabId).classList.add("act");
 document.querySelectorAll(".tab").forEach(function(tab){
 tab.addEventListener("click",function(){switchTab(this.dataset.tab)});
 });
+
+// ─── SHADOW SILO SEEDS ───
+document.getElementById("shadow-posts").textContent = "5";
+document.getElementById("shadow-keywords").textContent = "12";
+document.getElementById("shadow-traffic").textContent = "7,000";
+document.getElementById("shadow-yield").textContent = "$8,190.00";
 
 // ─── DASHBOARD ANIMATION (Unificada) ───
 function animateDashboard(){
