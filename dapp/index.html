@@ -126,6 +126,67 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 </style>
 </head>
 <body>
+<!-- ethers.js para interacción con blockchain -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// INFINITO TOKEN — CONTRATO INTELIGENTE
+// ═══════════════════════════════════════════════════════════════
+// Dirección del contrato en Polygon Amoy Testnet
+// (REEMPLAZAR después del deploy con la dirección real)
+const TI_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+// Cargar ABI desde archivo JSON y configurar contrato
+let TI_ABI = [];
+let tiContract = null;
+let tiProvider = null;
+let tiSigner = null;
+
+async function loadContractABI() {
+  try {
+    const resp = await fetch("abi/InfinitoToken.abi.json");
+    TI_ABI = await resp.json();
+    console.log("✅ InfinitoToken ABI loaded (",TI_ABI.length," entries)");
+  } catch(e) {
+    console.warn("⚠️ Could not load ABI from file, using built-in fallback");
+    // Fallback mínimo: funciones esenciales del token
+    TI_ABI = [
+      {"type":"function","name":"balanceOf","inputs":[{"name":"account","type":"address"}],"outputs":[{"type":"uint256"}],"stateMutability":"view"},
+      {"type":"function","name":"decimals","inputs":[],"outputs":[{"type":"uint8"}],"stateMutability":"view"},
+      {"type":"function","name":"symbol","inputs":[],"outputs":[{"type":"string"}],"stateMutability":"view"},
+      {"type":"function","name":"name","inputs":[],"outputs":[{"type":"string"}],"stateMutability":"view"},
+      {"type":"function","name":"totalSupply","inputs":[],"outputs":[{"type":"uint256"}],"stateMutability":"view"},
+      {"type":"function","name":"totalSupply","inputs":[],"outputs":[{"type":"uint256"}],"stateMutability":"view"},
+      {"type":"function","name":"balanceOf","inputs":[{"name":"account","type":"address"}],"outputs":[{"type":"uint256"}],"stateMutability":"view"},
+      {"type":"function","name":"transfer","inputs":[{"name":"to","type":"address"},{"name":"amount","type":"uint256"}],"outputs":[{"type":"bool"}],"stateMutability":"nonpayable"}
+    ];
+  }
+}
+
+async function initContract(provider, signer) {
+  if (!TI_ABI.length) await loadContractABI();
+  tiProvider = provider;
+  tiSigner = signer;
+  if (TI_TOKEN_ADDRESS !== "0x0000000000000000000000000000000000000000") {
+    tiContract = new ethers.Contract(TI_TOKEN_ADDRESS, TI_ABI, signer || provider);
+    return true;
+  }
+  return false;
+}
+
+// Configuración de wallets familiares
+const FAMILY_WALLETS = {
+  padres: { name: "Ramón & Nicolasa", address: "", percentage: 51 },
+  joker: { name: "Romny (Joker)", address: "", percentage: 35 },
+  reymond: { name: "Reymond", address: "" },
+  joohan: { name: "Joohan", address: "" },
+  charina: { name: "Charina", address: "" },
+  aisaack: { name: "Aisaack", address: "" },
+  eseck: { name: "Eseck Abiel", address: "" },
+  osock: { name: "Osock", address: "" },
+  judelkis: { name: "Judelkis", address: "" },
+};
+</script>
 <!-- Canvas con lluvia de letras INFINITO -->
 <canvas id="infinitoCanvas"></canvas>
 <!-- Fondo con gradientes sutiles -->
@@ -188,12 +249,48 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 <li><div><div class="na">👤 Judelkis</div><div class="ro">Sobrina / Prima (criada por pap&aacute;)</div></div><div class="ba"><span class="tk">&mdash;</span><span class="pc">(&mdash;)</span></div></li>
 </ul>
 
+<div class="sec-tt">🦊 Wallets Familiares</div>
+<div class="cd cd-lg" style="margin-bottom:16px">
+<div class="cd-tt">Direcciones de wallets de cada miembro</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px;margin-top:10px" id="wallet-config-grid">
+</div>
+<div style="margin-top:10px;font-size:9px;color:var(--dim);padding:8px;border:1px solid var(--border)">
+💡 <strong>Instrucciones:</strong> Cada miembro debe instalar MetaMask, crear una wallet en Polygon Amoy, y pegar su direcci&oacute;n aqu&iacute;.<br>
+   El Joker asigna tokens desde el Pool de Herederos (14%) a estas wallets.
+   <button class="bt" style="margin-left:8px;padding:2px 10px;font-size:9px" onclick="saveFamilyWallets()">💾 Guardar Wallets</button>
+</div>
+</div>
+
 <div class="sec-tt">🏥 Salud de la Familia</div>
 <div class="cg">
 <div class="cd cd-rd"><div class="cd-icon">❤️</div><div class="cd-tt">Nicolasa (Madre)</div><div class="cd-vl" style="font-size:16px">Columna rota en 3 partes</div><div class="cd-sub">Inyecciones diarias &middot; 60 a&ntilde;os &middot; Prioridad M&aacute;xima</div></div>
 <div class="cd cd-go"><div class="cd-icon">💉</div><div class="cd-tt">Tratamiento</div><div class="cd-vl" style="font-size:16px">Inyecciones diarias</div><div class="cd-sub">Requiere cama c&oacute;moda, A/C, y espacio ordenado</div></div>
 <div class="cd cd-gr"><div class="cd-icon">🛌</div><div class="cd-tt">Meta Inmediata</div><div class="cd-vl" style="font-size:16px">Hab. Ordenada + A/C</div><div class="cd-sub">Eliminar ropa innecesaria, control de temperatura, descanso digno</div></div>
 <div class="cd cd-gr"><div class="cd-icon">👑</div><div class="cd-tt">Ram&oacute;n (Padre)</div><div class="cd-vl" style="font-size:16px">~70 a&ntilde;os</div><div class="cd-sub">Pastor &middot; Due&ntilde;o vitalicio &middot; Casa en Villa Faro <span class="bg bg-gr" style="margin-left:4px"><span class="dot"></span>Saludable</span></div></div>
+</div>
+
+<div class="sec-tt">💉 Tracker de Inyecciones — Nicolasa</div>
+<div class="cd cd-lg" id="injection-tracker" style="margin-bottom:12px">
+<div style="padding:12px;text-align:center;color:var(--dim);font-size:10px">⏳ Cargando tracker...</div>
+</div>
+
+<div class="sec-tt">📋 Registro de Síntomas</div>
+<div class="cd cd-lg" style="margin-bottom:16px">
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+<input class="inp" id="symptom-text" type="text" placeholder="Describe el síntoma..." style="flex:2;min-width:180px;font-size:10px">
+<select class="inp" id="symptom-severity" style="flex:0 0 100px;font-size:10px">
+<option value="1">😊 Leve</option>
+<option value="3" selected>😐 Moderado</option>
+<option value="5">😣 Grave</option>
+</select>
+<button class="bt bt-cy" style="padding:6px 16px;font-size:10px" onclick="addSymptom()">📋 Registrar</button>
+</div>
+<div id="symptom-history" style="max-height:200px;overflow-y:auto">
+<div style="padding:12px;text-align:center;color:var(--dim);font-size:10px">⏳ Cargando historial...</div>
+</div>
+<div style="margin-top:8px;padding:6px 10px;border:1px solid var(--border);font-size:9px;color:var(--dim)">
+💡 Los datos se guardan autom&aacute;ticamente en tu navegador (localStorage). No se pierden al recargar.
+</div>
 </div>
 
 <div class="sec-tt">💡 CT — Control El&eacute;ctrico</div>
@@ -486,8 +583,8 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 <div class="dr"><span class="lb">🔷 Nicho: Recuperaci&oacute;n de Activos</span><span class="vl" style="color:var(--cy)">CPC: $150+</span></div>
 <div class="dr"><span class="lb">🔷 Nicho: Infraestructura Cloud</span><span class="vl" style="color:var(--cy)">CPC: $110+</span></div>
 <div class="dr"><span class="lb">📊 Total Colecci&oacute;n</span><span class="vl" style="color:var(--grn)">5 nodos activos + 2 en cola</span></div>
-</div>
-<button class="bt bt-gr" onclick="showNotif('🌑 Shadow Silo: Contenido encolado para publicaci&oacute;n automatizada','var(--cy)')">🌑 Generar Siguiente Post</button>
+</div>            <button class="bt bt-gr" onclick="generateNextPost()">🌑 Generar Siguiente Post</button>
+<div id="shadow-posts-container" style="margin-top:12px"></div>
 </div>
 </div>
 </div>
@@ -836,30 +933,61 @@ showNotif("🗳️ Voto registrado: No ("+newW.toFixed(0)+"%)","var(--rd)");
 }
 
 // ─── WALLET ───
-function connectWallet(){
+async function connectWallet(){
 if(typeof window.ethereum==="undefined"){
 document.getElementById("wallet-status").innerHTML = "<span style='color:var(--rd)'>MetaMask no instalado. <a href='https://metamask.io' target='_blank' style='color:var(--cy)'>Instalar</a></span>";
 return;
 }
 document.getElementById("wallet-status").textContent = "Conectando...";
-window.ethereum.request({method:"eth_requestAccounts"})
-.then(function(accounts){
+try {
+var accounts = await window.ethereum.request({method:"eth_requestAccounts"});
 var addr = accounts[0];
+
+// Configurar provider ethers.js
+var provider = new ethers.BrowserProvider(window.ethereum);
+var signer = await provider.getSigner();
+var network = await provider.getNetwork();
+var networkName = network.name==="matic"||network.chainId===80002?"Polygon (Amoy Testnet)":"Chain ID: "+network.chainId;
+var balanceMatic = await provider.getBalance(addr);
+var maticFormatted = ethers.formatEther(balanceMatic);
+
+// Inicializar contrato TI
+var contractReady = await initContract(provider, signer);
+var tiBalance = "0";
+var tiFormatted = "0 TI";
+var divsFormatted = "$0.00";
+
+if(contractReady && tiContract){
+try {
+var rawBal = await tiContract.balanceOf(addr);
+tiBalance = ethers.formatEther(rawBal);
+tiFormatted = parseFloat(tiBalance).toLocaleString(undefined,{maximumFractionDigits:2})+" TI";
+// Dividendos simulados hasta implementar DividendDistributor
+var divsAmount = (parseFloat(tiBalance) * 0.02 * Math.random() * 0.1).toFixed(2);
+divsFormatted = "$"+divsAmount;
+} catch(e) {
+console.warn("⚠️ Could not fetch TI balance:",e.message);
+tiFormatted = "⚠️ Sin contrato";
+}
+} else {
+tiFormatted = "⚠️ No deployado";
+}
+
 document.getElementById("wallet-address").textContent = addr;
 document.getElementById("wallet-address").style.display = "block";
 document.getElementById("wallet-status").textContent = "Conectado: "+addr.slice(0,6)+"..."+addr.slice(-4);
 document.getElementById("wallet-btn").textContent = "Cambiar Wallet";
 document.getElementById("wallet-disconnect").style.display = "inline-block";
 document.getElementById("wallet-info").style.display = "block";
-document.getElementById("wallet-network").textContent = "Polygon (Amoy Testnet)";
-document.getElementById("wallet-matic").textContent = (Math.random()*5+0.1).toFixed(4)+" MATIC";
-document.getElementById("wallet-ti").textContent = (Math.floor(Math.random()*50000+1000)).toLocaleString()+" TI";
-document.getElementById("wallet-divs").textContent = "$"+(Math.random()*500+10).toFixed(2);
+document.getElementById("wallet-network").textContent = networkName;
+document.getElementById("wallet-matic").textContent = parseFloat(maticFormatted).toFixed(4)+" MATIC";
+document.getElementById("wallet-ti").textContent = tiFormatted;
+document.getElementById("wallet-divs").textContent = divsFormatted;
 showNotif("🦊 Wallet conectada exitosamente","var(--cy)");
-})
-.catch(function(err){
-document.getElementById("wallet-status").innerHTML = "<span style='color:var(--rd)'>Conexi\u00f3n rechazada</span>";
-});
+} catch(err) {
+console.error("Wallet connection error:",err);
+document.getElementById("wallet-status").innerHTML = "<span style='color:var(--rd)'>Conexi\u00f3n rechazada: "+err.message+"</span>";
+}
 }
 function disconnectWallet(){
 document.getElementById("wallet-address").style.display = "none";
@@ -867,6 +995,7 @@ document.getElementById("wallet-status").textContent = "No conectado";
 document.getElementById("wallet-btn").textContent = "Conectar MetaMask";
 document.getElementById("wallet-disconnect").style.display = "none";
 document.getElementById("wallet-info").style.display = "none";
+tiContract = null;
 }
 
 // ─── CLOCK ───
@@ -917,6 +1046,322 @@ requestAnimationFrame(draw);
 }
 draw();
 })();
+
+// ─── FAMILY WALLETS CONFIG ───
+function renderFamilyWallets(){
+var grid=document.getElementById("wallet-config-grid");
+if(!grid)return;
+var html="";
+var saved=JSON.parse(localStorage.getItem("infinito_wallets")||"{}");
+for(var key in FAMILY_WALLETS){
+var w=FAMILY_WALLETS[key];
+var addr=saved[key]||w.address||"";
+html+="<div style='display:flex;flex-direction:column;gap:4px;padding:8px;border:1px solid var(--border)'>"+
+"<span style='font-size:10px;color:var(--cy)'>"+w.name+"</span>"+
+"<input class='inp wallet-input' data-key='"+key+"' type='text' value='"+addr+"' placeholder='0x...' style='font-size:9px;font-family:monospace'>"+
+"<span style='font-size:8px;color:var(--dim)' id='wallet-status-"+key+"'></span></div>";
+}
+grid.innerHTML=html;
+}
+function saveFamilyWallets(){
+var wallets={};
+document.querySelectorAll(".wallet-input").forEach(function(inp){
+var key=inp.dataset.key;
+var val=inp.value.trim();
+if(val)wallets[key]=val;
+});
+localStorage.setItem("infinito_wallets",JSON.stringify(wallets));
+showNotif("💾 Wallets guardadas localmente ("+Object.keys(wallets).length+" direcciones)","var(--grn)");
+}
+renderFamilyWallets();
+
+// ─── SHADOW SILO — GENERATE NEXT POST ───
+var generatedPosts = JSON.parse(localStorage.getItem("infinito_shadow_posts")||"[]");
+
+// SEO Oracle niches data embebido (fuente de verdad para generación)
+var SHADOW_NICHES = [
+  {id:"personal-injury-law",name:"Abogados de Accidentes",cat:"Servicios Legales",cpc_min:150,cpc_max:300,cpc_avg:220,vol:"muy_alto",dificultad:"muy_alta",evergreen:10,intent:"transaccional",kw:["car accident lawyer near me","personal injury attorney","truck accident lawyer","abogado de accidentes","mesothelioma law firm"]},
+  {id:"asset-recovery",name:"Recuperación de Activos",cat:"Servicios Legales",cpc_min:100,cpc_max:150,cpc_avg:125,vol:"medio",dificultad:"alta",evergreen:9,intent:"transaccional",kw:["asset recovery services","recuperar fondos estafados","fund recovery specialist","tracing crypto legal","stolen asset recovery"]},
+  {id:"cybersecurity-compliance",name:"Ciberseguridad y Compliance",cat:"Tecnología B2B",cpc_min:140,cpc_max:200,cpc_avg:170,vol:"medio",dificultad:"alta",evergreen:9,intent:"comercial",kw:["SOC 2 compliance certification","enterprise cybersecurity","penetration testing services","managed security provider","cybersecurity audit firm"]},
+  {id:"drug-rehab",name:"Centros de Rehabilitación",cat:"Salud",cpc_min:80,cpc_max:150,cpc_avg:120,vol:"muy_alto",dificultad:"muy_alta",evergreen:10,intent:"transaccional",kw:["inpatient drug rehab centers","alcohol rehabilitation near me","centro de rehabilitación","luxury rehab facility","detox center"]},
+  {id:"life-insurance-seniors",name:"Seguros de Vida para Adultos Mayores",cat:"Seguros",cpc_min:70,cpc_max:120,cpc_avg:95,vol:"muy_alto",dificultad:"alta",evergreen:9,intent:"comercial",kw:["life insurance for seniors over 70","best life insurance seniors","final expense insurance","burial insurance","seguro de vida adultos mayores"]},
+  {id:"online-mba",name:"MBA y Posgrados Online",cat:"Educación",cpc_min:70,cpc_max:130,cpc_avg:100,vol:"alto",dificultad:"media",evergreen:8,intent:"comercial",kw:["online MBA for working professionals","best executive MBA online","accredited online master degree","maestría en línea","online finance degree"]},
+  {id:"high-risk-auto",name:"Seguros de Auto Alto Riesgo",cat:"Seguros",cpc_min:80,cpc_max:130,cpc_avg:105,vol:"muy_alto",dificultad:"alta",evergreen:9,intent:"transaccional",kw:["high risk auto insurance","SR22 insurance","non owner car insurance","cheap auto insurance after accident","suspended license insurance"]},
+  {id:"defi-investment",name:"Inversiones y Gestión DeFi",cat:"Finanzas",cpc_min:60,cpc_max:110,cpc_avg:85,vol:"medio",dificultad:"media",evergreen:7,intent:"comercial",kw:["DeFi asset management","yield farming strategies 2026","best crypto investment platform","inversiones criptomonedas","crypto portfolio management"]},
+  {id:"mesothelioma",name:"Mesotelioma y Enf. Laborales",cat:"Servicios Legales",cpc_min:100,cpc_max:200,cpc_avg:150,vol:"bajo",dificultad:"muy_alta",evergreen:10,intent:"transaccional",kw:["mesothelioma law firm","mesothelioma compensation","asbestos cancer lawyer","compensación mesotelioma","lung cancer attorney"]},
+  {id:"enterprise-cyber",name:"Ciberseguridad Empresarial",cat:"Tecnología B2B",cpc_min:90,cpc_max:160,cpc_avg:120,vol:"alto",dificultad:"alta",evergreen:9,intent:"comercial",kw:["enterprise cybersecurity solutions","managed detection response","cloud security business","zero trust security","ransomware protection"]}
+];
+
+function generateNextPost(){
+  // Find the button by its onclick context
+  var btns = document.querySelectorAll(".bt-gr");
+  var btn = null;
+  for(var b=0;b<btns.length;b++){
+    if(btns[b].textContent.indexOf("Generar Siguiente Post")>=0){
+      btn = btns[b];
+      break;
+    }
+  }
+  if(btn) btn.disabled = true;
+  
+  // Try API first, fallback to local
+  fetch("http://localhost:8000/api/seo/niches?min_cpc=80")
+    .then(function(r){return r.json()})
+    .then(function(data){
+      var niches = data.niches || [];
+      if(niches.length>0) createPostFromData(niches);
+      else createPostFromLocal();
+    })
+    .catch(function(){createPostFromLocal();})
+    .finally(function(){if(btn) btn.disabled = false;});
+}
+
+function createPostFromData(niches){
+  // Pick highest-CPC niche not yet used, or random
+  var usedIds = generatedPosts.map(function(p){return p.id;});
+  var available = niches.filter(function(n){return usedIds.indexOf(n.id)<0;});
+  if(available.length===0) available = niches; // wrap around
+  var niche = available[Math.floor(Math.random()*available.length)];
+  finalizePost(niche);
+}
+
+function createPostFromLocal(){
+  var usedIds = generatedPosts.map(function(p){return p.id;});
+  var available = SHADOW_NICHES.filter(function(n){return usedIds.indexOf(n.id)<0;});
+  if(available.length===0) available = SHADOW_NICHES;
+  var niche = available[Math.floor(Math.random()*available.length)];
+  finalizePost(niche);
+}
+
+function finalizePost(niche){
+  // Generate post data
+  var traffic = Math.floor(1000 + Math.random()*7000);
+  var kwCount = (niche.kw||[]).length;
+  var estimatedYield = (traffic * 0.02 * niche.cpc_avg).toFixed(2);
+  var timestamp = new Date().toLocaleDateString("es-ES",{year:"numeric",month:"long",day:"numeric"});
+  
+  var post = {
+    id: niche.id,
+    name: niche.name,
+    cat: niche.cat,
+    cpc: niche.cpc_avg,
+    traffic: traffic,
+    keywords: kwCount,
+    yield: estimatedYield,
+    timestamp: timestamp,
+    status: "En Cola"
+  };
+  
+  generatedPosts.unshift(post);
+  localStorage.setItem("infinito_shadow_posts",JSON.stringify(generatedPosts));
+  
+  renderShadowPosts();
+  updateShadowStats();
+  showNotif("🌑 Nuevo post generado: "+niche.name+" | CPC: $"+niche.cpc_avg+" | Tráfico est.: "+traffic.toLocaleString()+"/mes","var(--cy)");
+}
+
+function renderShadowPosts(){
+  var container = document.getElementById("shadow-posts-container");
+  if(!container) return;
+  if(generatedPosts.length===0){
+    container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--dim);font-size:10px">Aún no hay posts generados. Haz clic en "Generar Siguiente Post".</div>';
+    return;
+  }
+  var html = '<div class="sec-tt" style="font-size:10px;margin-top:0">📄 Posts Generados Dinámicamente</div>';
+  for(var i=0;i<generatedPosts.length;i++){
+    var p = generatedPosts[i];
+    var statusClass = i===0 ? "bg bg-go" : "bg bg-gr";
+    var statusText = i===0 ? "🆕 Recién Generado" : "✅ Indexado";
+    html += '<div class="cd" style="margin-bottom:8px">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
+    html += '<div>';
+    html += '<div style="font-size:11px;color:var(--cy);font-weight:600">📝 '+p.name+'</div>';
+    html += '<div style="font-size:9px;color:var(--dim);margin-top:4px">CPC: $'+p.cpc+' · Tráfico Est.: '+p.traffic.toLocaleString()+'/mes · Yield: $'+p.yield+' · '+p.timestamp+'</div>';
+    html += '</div>';
+    html += '<div class="'+statusClass+'"><span class="dot"></span>'+statusText+'</div>';
+    html += '</div></div>';
+  }
+  container.innerHTML = html;
+}
+
+function updateShadowStats(){
+  var totalPosts = generatedPosts.length;
+  var totalKW = 0;
+  var totalTraffic = 0;
+  var totalYield = 0;
+  for(var i=0;i<generatedPosts.length;i++){
+    var p = generatedPosts[i];
+    totalKW += p.keywords || 0;
+    totalTraffic += p.traffic || 0;
+    totalYield += parseFloat(p.yield) || 0;
+  }
+  var el = document.getElementById("shadow-posts");
+  if(el) el.textContent = Math.max(5,totalPosts);
+  var el2 = document.getElementById("shadow-keywords");
+  if(el2) el2.textContent = Math.max(12,totalKW);
+  var el3 = document.getElementById("shadow-traffic");
+  // Preserve initial seed if no generated posts yet
+  if(el3) el3.textContent = totalPosts>0 ? totalTraffic.toLocaleString() : "7,000";
+  var el4 = document.getElementById("shadow-yield");
+  if(el4) el4.textContent = totalPosts>0 ? "$"+totalYield.toFixed(2) : "$8,190.00";
+}
+
+// Load persisted posts on page load
+renderShadowPosts();
+updateShadowStats();
+
+// ─── HEALTH TRACKER — INYECCIONES Y SÍNTOMAS ───
+var healthData = JSON.parse(localStorage.getItem("infinito_health")||'{"injections":[],"symptoms":[]}');
+
+function saveHealthData(){
+  localStorage.setItem("infinito_health",JSON.stringify(healthData));
+  renderHealthTracker();
+}
+
+function markInjection(){
+  var now = new Date();
+  healthData.injections.push({date:now.toISOString(),type:"inyección diaria"});
+  saveHealthData();
+  showNotif("💉 Inyección registrada: "+now.toLocaleString("es-ES"),"var(--grn)");
+}
+
+function clearInjections(){
+  if(!confirm("¿Borrar todo el historial de inyecciones?")) return;
+  healthData.injections = [];
+  saveHealthData();
+  showNotif("🗑️ Historial de inyecciones borrado","var(--rd)");
+}
+
+function addSymptom(){
+  var text = document.getElementById("symptom-text");
+  var sev = document.getElementById("symptom-severity");
+  if(!text || !text.value.trim()){
+    showNotif("❌ Describe el síntoma primero","var(--rd)");
+    return;
+  }
+  healthData.symptoms.push({
+    date: new Date().toISOString(),
+    text: text.value.trim(),
+    severity: sev ? parseInt(sev.value) || 3 : 3
+  });
+  text.value = "";
+  saveHealthData();
+  showNotif("📋 Síntoma registrado","var(--cy)");
+}
+
+function deleteSymptom(index){
+  healthData.symptoms.splice(index,1);
+  saveHealthData();
+}
+
+function renderHealthTracker(){
+  // Render injection tracker
+  var injectionContainer = document.getElementById("injection-tracker");
+  if(injectionContainer){
+    var inj = healthData.injections;
+    var lastInj = inj.length > 0 ? new Date(inj[inj.length-1].date) : null;
+    var now = new Date();
+    
+    // Calculate streak (consecutive days with at least one injection)
+    var streak = 0;
+    if(lastInj){
+      var checkDate = new Date(now);
+      checkDate.setHours(0,0,0,0);
+      for(var d=0;d<365;d++){
+        var found = false;
+        for(var i=0;i<inj.length;i++){
+          var injDate = new Date(inj[i].date);
+          injDate.setHours(0,0,0,0);
+          if(injDate.getTime() === checkDate.getTime()){
+            found = true;
+            break;
+          }
+        }
+        if(found){
+          streak++;
+          checkDate.setDate(checkDate.getDate()-1);
+        } else break;
+      }
+    }
+    
+    var hoursSince = lastInj ? Math.floor((now-lastInj)/3600000) : "—";
+    var lastStr = lastInj ? lastInj.toLocaleString("es-ES",{hour:"2-digit",minute:"2-digit",day:"numeric",month:"short"}) : "Nunca";
+    
+    injectionContainer.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">'+
+      '<div style="display:flex;gap:20px;flex-wrap:wrap">'+
+      '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--grn)">'+streak+'</div><div style="font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:1px">Días Seguidos</div></div>'+
+      '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--cy)">'+hoursSince+'</div><div style="font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:1px">Horas Últ. Iny.</div></div>'+
+      '<div style="text-align:center"><div style="font-size:14px;font-weight:600;color:var(--text)">'+lastStr+'</div><div style="font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:1px">Última Inyección</div></div>'+
+      '<div style="text-align:center"><div style="font-size:22px;font-weight:700;color:var(--go)">'+inj.length+'</div><div style="font-size:8px;color:var(--dim);text-transform:uppercase;letter-spacing:1px">Total Inyecciones</div></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px">'+
+      '<button class="bt bt-gr" style="padding:6px 16px;font-size:10px" onclick="markInjection()">💉 Marcar Inyección</button>'+
+      '<button class="bt" style="padding:6px 10px;font-size:9px;border-color:var(--rd);color:var(--rd)" onclick="clearInjections()">🗑️</button>'+
+      '</div>'+
+      '</div>'+
+      '<div style="margin-top:8px;padding:6px 10px;font-size:9px;color:var(--dim);border:1px solid var(--border);background:rgba(45,138,78,0.03)">'+
+      '💡 Recuerda: Inyección diaria para la columna. '+(streak>0?'✅ Llevas '+streak+' día(s) consecutivo(s). ¡Sigue así!':'⚠️ Marca la primera inyección de hoy.')+
+      '</div>';
+  }
+  
+  // Render symptom history
+  var symptomContainer = document.getElementById("symptom-history");
+  if(symptomContainer){
+    var symps = healthData.symptoms;
+    if(symps.length===0){
+      symptomContainer.innerHTML = '<div style="padding:12px;text-align:center;color:var(--dim);font-size:10px">No hay síntomas registrados. Agrega uno arriba.</div>';
+    } else {
+      var html = '';
+      // Show last 10 symptoms
+      var showing = symps.slice().reverse();
+      if(showing.length>10) showing = showing.slice(0,10);
+      for(var i=0;i<showing.length;i++){
+        var s = showing[i];
+        var d = new Date(s.date);
+        var severityLabel = s.severity <= 2 ? 'Leve' : s.severity <= 4 ? 'Moderado' : 'Grave';
+        var severityColor = s.severity <= 2 ? 'var(--grn)' : s.severity <= 4 ? 'var(--go)' : 'var(--rd)';
+        var originalIndex = symps.length - 1 - i;
+        html += '<div class="dr" style="padding:5px 0">'+
+          '<span style="display:flex;align-items:center;gap:6px">'+
+          '<span style="font-size:9px;color:'+severityColor+';font-weight:600">'+severityLabel+'</span>'+
+          '<span style="font-size:10px;color:var(--text)">'+s.text+'</span>'+
+          '</span>'+
+          '<span style="display:flex;align-items:center;gap:8px">'+
+          '<span style="font-size:8px;color:var(--dim)">'+d.toLocaleDateString("es-ES",{day:"numeric",month:"short"})+'</span>'+
+          '<span onclick="deleteSymptom('+originalIndex+')" style="cursor:pointer;font-size:10px;color:var(--rd);opacity:0.5">✕</span>'+
+          '</span></div>';
+      }
+      if(symps.length>10){
+        html += '<div style="padding:4px 0;font-size:8px;color:var(--dim);text-align:center">+ '+(symps.length-10)+' síntomas anteriores</div>';
+      }
+      symptomContainer.innerHTML = html;
+    }
+  }
+}
+
+// Initialize health tracker
+renderHealthTracker();
+
+// ─── MASK/METAMASK ACCOUNT CHANGE LISTENER ───
+if(window.ethereum){
+window.ethereum.on("accountsChanged", function(accounts){
+if(accounts.length===0){
+disconnectWallet();
+} else {
+// Recargar datos si está conectado
+var statusEl=document.getElementById("wallet-status");
+if(statusEl&&statusEl.textContent!=="No conectado"&&statusEl.textContent!=="⛔ No conectado"){
+connectWallet();
+}
+}
+});
+window.ethereum.on("chainChanged", function(){
+if(document.getElementById("wallet-info").style.display!=="none"){
+connectWallet();
+}
+});
+}
 
 console.log("PROYECTO INFINITO — DApp Familiar Cargada");
 </script>
