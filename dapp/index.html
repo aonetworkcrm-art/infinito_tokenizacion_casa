@@ -575,15 +575,49 @@ const FAMILY_WALLETS = {
 </div>
 </div>
 
-<div class="sec-tt">🔄 Indexaci&oacute;n Autom&aacute;tica</div>
+<div class="sec-tt">🔄 Auto-Pilot &mdash; Generaci&oacute;n Autom&aacute;tica</div>
 <div class="cg">
 <div class="cd cd-lg">
-<div class="cd-tt">Pr&oacute;ximo Post Programado</div>
-<div id="shadow-queue" style="font-size:11px;padding:8px 0">
-<div class="dr"><span class="lb">🔷 Nicho: Recuperaci&oacute;n de Activos</span><span class="vl" style="color:var(--cy)">CPC: $150+</span></div>
-<div class="dr"><span class="lb">🔷 Nicho: Infraestructura Cloud</span><span class="vl" style="color:var(--cy)">CPC: $110+</span></div>
-<div class="dr"><span class="lb">📊 Total Colecci&oacute;n</span><span class="vl" style="color:var(--grn)">5 nodos activos + 2 en cola</span></div>
-</div>            <button class="bt bt-gr" onclick="generateNextPost()">🌑 Generar Siguiente Post</button>
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+<div>
+<div class="cd-tt">Estado del Auto-Pilot</div>
+<div id="autopilot-status" style="font-size:10px;margin-top:4px">⏸️ Apagado</div>
+</div>
+<button class="bt" id="autopilot-toggle-btn" onclick="autoPilotToggle()" style="min-width:100px;text-align:center">▶️ Activar</button>
+</div>
+
+<div style="margin:12px 0">
+<div class="dr"><span class="lb">⏱️ Pr&oacute;ximo Post</span><span class="vl" id="autopilot-next">—</span></div>
+<div class="dr"><span class="lb">📊 Posts Generados (Auto)</span><span class="vl" id="autopilot-count" style="color:var(--cy)">0</span></div>
+<div class="dr"><span class="lb">🔄 Intervalo</span><span class="vl" style="display:flex;gap:8px;align-items:center">
+  <input type="range" id="autopilot-interval" min="1" max="72" value="24" oninput="autoPilotUpdateInterval(this.value)" style="width:80px;height:4px;accent-color:var(--grn)">
+  <span id="autopilot-interval-label" style="color:var(--cy);font-size:10px">24h</span>
+</span></div>
+<div class="dr"><span class="lb">🎯 Estrategia</span><span class="vl">
+  <select id="autopilot-strategy" onchange="autoPilotSaveConfig()" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:2px 6px;font-size:9px">
+    <option value="random">Aleatorio</option>
+    <option value="highest-cpc">Mayor CPC</option>
+    <option value="rotating" selected>Rotativo (sin repetir)</option>
+  </select>
+</span></div>
+</div>
+
+<div style="margin:8px 0 4px">
+<div style="display:flex;justify-content:space-between;font-size:8px;color:var(--dim);margin-bottom:2px">
+<span>⏳ Tiempo para pr&oacute;ximo post</span>
+<span id="autopilot-progress-pct">0%</span>
+</div>
+<div class="pb" style="height:4px;margin:0"><div class="pb-b" id="autopilot-progress-bar" style="width:0%"></div></div>
+</div>
+
+<div id="autopilot-log" style="margin-top:8px;max-height:80px;overflow-y:auto;font-size:8px;color:var(--dim);border-top:1px solid var(--border);padding-top:6px">
+📋 Auto-Pilot iniciando...
+</div>
+
+<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+<button class="bt bt-gr" onclick="generateNextPost()">🌑 Generar Siguiente Post</button>
+<button class="bt bt-cy" onclick="autoPilotGenerateNow()" style="font-size:9px;padding:6px 14px">⚡ Generar Ahora (Auto)</button>
+</div>
 <div id="shadow-posts-container" style="margin-top:12px"></div>
 </div>
 </div>
@@ -1209,6 +1243,161 @@ function updateShadowStats(){
 // Load persisted posts on page load
 renderShadowPosts();
 updateShadowStats();
+
+// ─── SHADOW SILO — AUTO-PILOT ───
+var autoPilotConfig = JSON.parse(localStorage.getItem("infinito_autopilot")||'{}');
+if(typeof autoPilotConfig.enabled==='undefined') autoPilotConfig.enabled = false;
+if(typeof autoPilotConfig.interval==='undefined') autoPilotConfig.interval = 24;
+if(typeof autoPilotConfig.strategy==='undefined') autoPilotConfig.strategy = 'rotating';
+if(typeof autoPilotConfig.lastPostTime==='undefined') autoPilotConfig.lastPostTime = 0;
+if(typeof autoPilotConfig.count==='undefined') autoPilotConfig.count = 0;
+
+var autoPilotTimer = null;
+var autoPilotIntervalMs = 60000; // check every minute
+
+function autoPilotSaveConfig(){
+  var stratEl = document.getElementById("autopilot-strategy");
+  if(stratEl) autoPilotConfig.strategy = stratEl.value;
+  localStorage.setItem("infinito_autopilot",JSON.stringify(autoPilotConfig));
+  autoPilotRender();
+}
+
+function autoPilotToggle(){
+  autoPilotConfig.enabled = !autoPilotConfig.enabled;
+  if(autoPilotConfig.enabled){
+    autoPilotConfig.lastPostTime = Date.now();
+    autoPilotLog("🚀 Auto-Pilot activado. Intervalo: "+autoPilotConfig.interval+"h");
+    if(!autoPilotTimer) autoPilotTimer = setInterval(autoPilotTick, autoPilotIntervalMs);
+  } else {
+    autoPilotLog("⏸️ Auto-Pilot desactivado");
+    if(autoPilotTimer){
+      clearInterval(autoPilotTimer);
+      autoPilotTimer = null;
+    }
+  }
+  autoPilotSaveConfig();
+}
+
+function autoPilotUpdateInterval(val){
+  autoPilotConfig.interval = parseInt(val);
+  var label = document.getElementById("autopilot-interval-label");
+  if(label) label.textContent = val+"h";
+  autoPilotSaveConfig();
+}
+
+function autoPilotGenerateNow(){
+  var strategy = autoPilotConfig.strategy;
+  var usedIds = generatedPosts.map(function(p){return p.id;});
+  var available = SHADOW_NICHES.slice();
+  
+  if(strategy === 'rotating'){
+    var unused = available.filter(function(n){return usedIds.indexOf(n.id)<0;});
+    if(unused.length>0) available = unused;
+  }
+  
+  var niche;
+  if(strategy === 'highest-cpc'){
+    available.sort(function(a,b){return b.cpc_avg - a.cpc_avg});
+    niche = available[0];
+  } else {
+    niche = available[Math.floor(Math.random()*available.length)];
+  }
+  
+  if(!niche) niche = SHADOW_NICHES[Math.floor(Math.random()*SHADOW_NICHES.length)];
+  finalizePost(niche);
+  
+  autoPilotConfig.lastPostTime = Date.now();
+  autoPilotConfig.count++;
+  autoPilotLog("🤖 Post generado automáticamente: "+niche.name);
+  autoPilotSaveConfig();
+}
+
+function autoPilotTick(){
+  if(!autoPilotConfig.enabled) return;
+  var elapsedHours = (Date.now() - autoPilotConfig.lastPostTime) / 3600000;
+  if(elapsedHours >= autoPilotConfig.interval){
+    autoPilotGenerateNow();
+  }
+  autoPilotRender();
+}
+
+function autoPilotRender(){
+  // Status
+  var statusEl = document.getElementById("autopilot-status");
+  var toggleBtn = document.getElementById("autopilot-toggle-btn");
+  
+  if(statusEl){
+    statusEl.innerHTML = autoPilotConfig.enabled
+      ? '<span style="color:var(--grn)">▶️ Activo</span>'
+      : '<span style="color:var(--dim)">⏸️ Apagado</span>';
+  }
+  if(toggleBtn){
+    toggleBtn.textContent = autoPilotConfig.enabled ? "⏸️ Pausar" : "▶️ Activar";
+    toggleBtn.className = autoPilotConfig.enabled ? "bt bt-go" : "bt bt-gr";
+  }
+  
+  // Count
+  var countEl = document.getElementById("autopilot-count");
+  if(countEl) countEl.textContent = autoPilotConfig.count;
+  
+  // Next post time
+  var nextEl = document.getElementById("autopilot-next");
+  if(nextEl){
+    if(!autoPilotConfig.enabled) {
+      nextEl.textContent = "—";
+    } else {
+      var remaining = (autoPilotConfig.interval * 3600000) - (Date.now() - autoPilotConfig.lastPostTime);
+      if(remaining <= 0) {
+        nextEl.textContent = "⚠️ Pendiente...";
+      } else {
+        var hrs = Math.floor(remaining / 3600000);
+        var mins = Math.floor((remaining % 3600000) / 60000);
+        nextEl.textContent = hrs+"h "+mins+"m";
+      }
+    }
+  }
+  
+  // Progress bar
+  var bar = document.getElementById("autopilot-progress-bar");
+  var pctEl = document.getElementById("autopilot-progress-pct");
+  if(bar && pctEl){
+    var elapsed = Date.now() - autoPilotConfig.lastPostTime;
+    var total = autoPilotConfig.interval * 3600000;
+    var pct = Math.min(100, (elapsed / total) * 100);
+    if(!autoPilotConfig.enabled) pct = 0;
+    bar.style.width = pct+"%";
+    pctEl.textContent = autoPilotConfig.enabled ? Math.floor(pct)+"%" : "0%";
+  }
+  
+  // Strategy select
+  var stratEl = document.getElementById("autopilot-strategy");
+  if(stratEl) stratEl.value = autoPilotConfig.strategy;
+  
+  // Interval slider
+  var sliderEl = document.getElementById("autopilot-interval");
+  if(sliderEl) sliderEl.value = autoPilotConfig.interval;
+  var labelEl = document.getElementById("autopilot-interval-label");
+  if(labelEl) labelEl.textContent = autoPilotConfig.interval+"h";
+}
+
+function autoPilotLog(msg){
+  var logEl = document.getElementById("autopilot-log");
+  if(!logEl) return;
+  var time = new Date().toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+  logEl.innerHTML = '<div>['+time+'] '+msg+'</div>' + logEl.innerHTML;
+  // Keep max 20 lines
+  while(logEl.children.length > 20) logEl.removeChild(logEl.lastChild);
+}
+
+// Start Auto-Pilot
+if(autoPilotConfig.enabled){
+  autoPilotLog("🚀 Auto-Pilot reanudado (intervalo: "+autoPilotConfig.interval+"h)");
+  autoPilotTimer = setInterval(autoPilotTick, autoPilotIntervalMs);
+} else {
+  autoPilotLog("⏸️ Auto-Pilot apagado. Actívalo para generación automática.");
+}
+autoPilotRender();
+autoPilotTick();
 
 // ─── HEALTH TRACKER — INYECCIONES Y SÍNTOMAS ───
 var healthData = JSON.parse(localStorage.getItem("infinito_health")||'{"injections":[],"symptoms":[]}');
