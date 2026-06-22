@@ -1,10 +1,11 @@
 # 🚀 GUÍA COMPLETA DEL PROYECTO INFINITO
 
-> **Versión**: 1.0 · Junio 2026  
+> **Versión**: 1.0 · Junio 2026 · ⚠️ DOCUMENTACIÓN LEGACY  
+> **📘 DOCUMENTACIÓN ACTUALIZADA**: `README.md` (incluye OpenRouter IA, Monetag, Posts Públicos)  
 > **Arquitecto**: Romny (El Joker)  
 > **IA Asistente**: Buffy (Codebuff AI)  
 > **Repositorio**: https://github.com/aonetworkcrm-art/infinito_tokenizacion_casa  
-> **DApp en vivo**: https://aonetworkcrm-art.github.io/infinito_tokenizacion_casa/
+> **DApp en vivo**: https://proyecto-infinito.vercel.app
 
 ---
 
