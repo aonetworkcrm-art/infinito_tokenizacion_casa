@@ -678,29 +678,8 @@ const FAMILY_WALLETS = {
 
 <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
 <button class="bt bt-gr" onclick="generateNextPost()">🌱 Generar Siguiente Post</button>
-<button class="bt bt-go" onclick="generateWithIA()" id="btn-generate-ia" style="font-size:9px;padding:6px 14px">🤖 Generar con IA</button>🌑 Generar Siguiente Post</button>
+<button class="bt bt-go" onclick="generateWithIA()" id="btn-generate-ia" style="font-size:9px;padding:6px 14px">🤖 Generar con IA</button>
 <button class="bt bt-cy" onclick="autoPilotGenerateNow()" style="font-size:9px;padding:6px 14px">⚡ Generar Ahora (Auto)</button>
-</div>
-
-<!-- ─── MONETAG CONFIG ─── -->
-<div id="monetag-config" style="margin-top:8px">
-<div class="dr" style="cursor:pointer" onclick="toggleMonetagConfig()">
-<span class="lb">📢 Anuncios Monetag</span>
-<span class="vl" id="monetag-status" style="color:var(--go);font-size:9px">⏸️ Desactivado</span>
-</div>
-<div id="monetag-config-form" style="display:none;padding:8px;border:1px solid var(--border);margin-top:4px">
-<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-<label style="font-size:9px;color:var(--dim);flex:1">Site ID (publisher.monerator.com):</label>
-<input class="inp" id="monetag-site-id" type="text" placeholder="1234567" style="font-size:9px;flex:2;min-width:120px;font-family:monospace">
-<button class="bt" style="padding:4px 10px;font-size:8px" onclick="saveMonetagConfig()">💾 Guardar</button>
-</div>
-<div style="display:flex;gap:6px;margin-top:6px;align-items:center;font-size:8px;color:var(--dim)">
-<label><input type="checkbox" id="monetag-enabled" onchange="saveMonetagConfig()"> Insertar anuncios Monetag en posts generados</label>
-</div>
-<div style="font-size:8px;color:var(--dim);margin-top:4px">
-💡 Los anuncios se inyectan automáticamente en el HTML generado. Obtén tu Site ID en <a href="https://publisher.monerator.com" target="_blank" style="color:var(--cy)">monetag.com</a>
-</div>
-</div>
 </div>
 
 <!-- ─── MONETAG CONFIG ─── -->
@@ -928,9 +907,12 @@ document.querySelectorAll(".tc").forEach(function(t){t.classList.remove("act")})
 document.querySelector(".tab[data-tab='"+tabId+"']").classList.add("act");
 document.getElementById(tabId).classList.add("act");
 }
+function initTabs(){
 document.querySelectorAll(".tab").forEach(function(tab){
 tab.addEventListener("click",function(){switchTab(this.dataset.tab)});
 });
+}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initTabs)}else{initTabs()}
 
 // ─── SHADOW SILO SEEDS ───
 document.getElementById("shadow-posts").textContent = "5";
