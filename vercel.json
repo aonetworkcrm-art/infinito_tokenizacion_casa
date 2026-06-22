@@ -3,23 +3,39 @@
   "version": 2,
   "buildCommand": null,
   "installCommand": "pip install -r requirements.txt",
-  "outputDirectory": "public",
+  "outputDirectory": ".",
   "functions": {
     "api/**/*.py": {
       "memory": 512,
-      "maxDuration": 30,
+      "maxDuration": 60,
       "excludeFiles": "{tests/**,test-results/**,blockchain/**,investigacion/**,scripts/**,GUIA_COMPLETA_*.md}"
     }
   },
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/sitemap.xml",
       "destination": "/api/index.py"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/posts/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/dapp/index.html"
     }
   ],
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/(.*)",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",

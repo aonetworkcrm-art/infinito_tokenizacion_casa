@@ -1514,7 +1514,12 @@ function createPostFromData(niches){
   var available = niches.filter(function(n){return usedIds.indexOf(n.id)<0;});
   if(available.length===0) available = niches; // wrap around
   var niche = available[Math.floor(Math.random()*available.length)];
+  
+  // Generar el post
   finalizePost(niche);
+  
+  // Auto-publicar para Google
+  autoPublishLatestPost();
 }
 
 function createPostFromLocal(){
@@ -2018,7 +2023,7 @@ function previewPostHTML(){
     }
   }
   
-  var result = generatePostHTML(post);
+    // El HTML se genera en el servidor via build_post_html()
   var preview = document.getElementById("editor-preview");
   if(preview){
     var html = result.html;
@@ -2392,6 +2397,32 @@ function publishToDApp(){
   closePostViewer();
 }
 
+  // Auto-publicar en el API de Vercel para que Google pueda indexarlo
+  var monetagID = localStorage.getItem('infinito_monetag_siteid') || '';
+  var endpoints = API_ENDPOINTS.slice();
+  for(var e=0;e<endpoints.length;e++){
+    try {
+      fetch(endpoints[e]+'/api/publish-post', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          slug: result.slug,
+          title: post.editedTitle || post.name,
+          content: post.content || '',
+          meta_description: post.metaDesc || '',
+          niche_name: post.name,
+          niche_cat: post.cat || 'SEO',
+          cpc: post.cpc || 0,
+          keywords: post.keywordsStr || '',
+          monetag_site_id: monetagID
+        })
+      }).then(function(r){
+        if(r.ok) console.log('Post auto-publicado en '+endpoints[e]);
+      }).catch(function(e){});
+      break; // Solo intentar el primer endpoint que funcione
+    } catch(e){}
+  }
+
 function generateSitemap(){
   var published = JSON.parse(localStorage.getItem("infinito_published_posts")||"[]");
   if(published.length===0) return;
@@ -2420,6 +2451,53 @@ function generateSitemap(){
   setTimeout(function(){URL.revokeObjectURL(url);}, 1000);
 }
 
+
+// ─── AUTO-PUBLISH (para que Google indexe los posts) ───
+function autoPublishLatestPost(){
+  if(generatedPosts.length === 0) return;
+  var post = generatedPosts[0];
+  if(!post) return;
+  
+  var title = post.editedTitle || post.name;
+  var slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'post';
+  var monetagID = (typeof monetagSiteID !== 'undefined') ? monetagSiteID : '';
+  
+  // Generar HTML completo y publicar en API
+  var result = generatePostHTML(post);
+  
+  var endpoints = API_ENDPOINTS.slice();
+  for(var e=0;e<endpoints.length;e++){
+    try {
+      fetch(endpoints[e]+'/api/publish-post', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          slug: slug,
+          title: title,
+          content: post.content || '',
+          meta_description: post.metaDesc || '',
+          niche_name: post.name,
+          niche_cat: post.cat || 'SEO',
+          cpc: post.cpc || 0,
+          keywords: post.keywordsStr || '',
+          monetag_site_id: monetagID
+        })
+      }).then(function(r){
+        if(r.ok){
+          console.log('✅ Post auto-publicado: '+slug);
+          // Marcar como publicado
+          post.published = true;
+          post.publishedSlug = slug;
+          localStorage.setItem('infinito_shadow_posts',JSON.stringify(generatedPosts));
+          renderShadowPosts();
+        }
+      }).catch(function(err){
+        console.warn('Auto-publish failed:', err);
+      });
+      break;
+    } catch(e){}
+  }
+}
 // Restore Monetag display on load
 (function(){
   updateMonetagDisplay();

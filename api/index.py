@@ -33,6 +33,11 @@ from api_server import app
 from api_openrouter import router as openrouter_router
 app.include_router(openrouter_router, prefix="/api")
 
+# ─── Importar módulo Posts Públicos (Google-indexable) ───
+from api_posts import router as posts_router, public_router as public_posts_router
+app.include_router(posts_router)
+app.include_router(public_posts_router)  # Sin prefix para /posts/{slug}, /sitemap.xml, /robots.txt
+
 # ─── Opcional: endpoint de health check específico de Vercel ───
 @app.get("/api/health")
 async def health_check():
