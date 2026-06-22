@@ -677,7 +677,8 @@ const FAMILY_WALLETS = {
 </div>
 
 <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-<button class="bt bt-gr" onclick="generateNextPost()">🌑 Generar Siguiente Post</button>
+<button class="bt bt-gr" onclick="generateNextPost()">🌱 Generar Siguiente Post</button>
+<button class="bt bt-go" onclick="generateWithIA()" id="btn-generate-ia" style="font-size:9px;padding:6px 14px">🤖 Generar con IA</button>🌑 Generar Siguiente Post</button>
 <button class="bt bt-cy" onclick="autoPilotGenerateNow()" style="font-size:9px;padding:6px 14px">⚡ Generar Ahora (Auto)</button>
 </div>
 
@@ -719,6 +720,34 @@ const FAMILY_WALLETS = {
 </div>
 <div style="font-size:8px;color:var(--dim);margin-top:4px">
 💡 Los anuncios se inyectan automáticamente en el HTML generado. Obtén tu Site ID en <a href="https://publisher.monerator.com" target="_blank" style="color:var(--cy)">monetag.com</a>
+</div>
+</div>
+</div>
+
+<!-- ─── OPENROUTER CONFIG ─── -->
+<div id="openrouter-config" style="margin-top:8px">
+<div class="dr" style="cursor:pointer" onclick="toggleORConfig()">
+<span class="lb">🤖 OpenRouter IA (generación con IA)</span>
+<span class="vl" id="or-status" style="color:var(--go);font-size:9px">⚠️ No configurado</span>
+</div>
+<div id="or-config-form" style="display:none;padding:8px;border:1px solid var(--border);margin-top:4px">
+<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+<label style="font-size:9px;color:var(--dim);flex:1">API Key (sk-or-v1-...):</label>
+<input class="inp" id="or-api-key" type="password" placeholder="sk-or-v1-..." style="font-size:9px;flex:2;min-width:200px;font-family:monospace">
+<button class="bt" style="padding:4px 10px;font-size:8px" onclick="saveORConfig()">💾 Guardar</button>
+<button class="bt bt-cy" style="padding:4px 10px;font-size:8px" onclick="toggleORKeyVisibility()">👁️</button>
+</div>
+<div style="display:flex;gap:6px;margin-top:6px;align-items:center;font-size:8px;color:var(--dim)">
+<label style="font-size:9px;color:var(--dim);flex:1">Modelo:</label>
+<select id="or-model" onchange="saveORConfig()" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:2px 6px;font-size:9px;flex:2">
+<option value="google/gemini-2.0-flash-lite-preview">👾 Gemini Flash Lite (gratis)</option>
+<option value="google/gemini-2.0-flash-001">👾 Gemini Flash 2.0</option>
+<option value="mistralai/mistral-7b-instruct">🤖 Mistral 7B (gratis)</option>
+<option value="meta-llama/llama-3.1-8b-instruct">🤖 Llama 3.1 8B</option>
+</select>
+</div>
+<div style="font-size:8px;color:var(--dim);margin-top:4px">
+💡 Obtén tu API Key gratis en <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--cy)">openrouter.ai/keys</a>. Usa modelos gratuitos para generar contenido SEO ilimitado.
 </div>
 </div>
 </div>
@@ -2028,7 +2057,155 @@ function publishPostHTML(){
   localStorage.setItem("infinito_shadow_posts",JSON.stringify(generatedPosts));
   renderShadowPosts();
   
-  showNotif("📤 HTML publicado: "+result.slug+".html ("+(result.html.length/1024).toFixed(1)+" // ─── SHADOW SILO — POST VIEWER & PUBLISH ───
+  showNotif("📤 HTML publicado: "+result.slug+".html ("+(result.html.length/1024).toFixed(1)+" // ─── OPENROUTER IA — CONFIG & GENERATE ───
+var orAPIKey = localStorage.getItem("infinito_or_key") || "";
+var orModel = localStorage.getItem("infinito_or_model") || "google/gemini-2.0-flash-lite-preview";
+
+function toggleORConfig(){
+  var form = document.getElementById("or-config-form");
+  if(!form) return;
+  form.style.display = form.style.display==="none"?"block":"none";
+  if(form.style.display==="block"){
+    var inp = document.getElementById("or-api-key");
+    if(inp) inp.value = orAPIKey;
+    var sel = document.getElementById("or-model");
+    if(sel) sel.value = orModel;
+  }
+}
+
+function toggleORKeyVisibility(){
+  var inp = document.getElementById("or-api-key");
+  if(inp) inp.type = inp.type==="password"?"text":"password";
+}
+
+function saveORConfig(){
+  var inp = document.getElementById("or-api-key");
+  var sel = document.getElementById("or-model");
+  if(inp) orAPIKey = inp.value.trim();
+  if(sel) orModel = sel.value;
+  localStorage.setItem("infinito_or_key", orAPIKey);
+  localStorage.setItem("infinito_or_model", orModel);
+  updateORDisplay();
+  showNotif("🤖 Configuración de OpenRouter guardada","var(--cy)");
+}
+
+function updateORDisplay(){
+  var el = document.getElementById("or-status");
+  if(!el) return;
+  if(orAPIKey && orAPIKey.startsWith("sk-or-")){
+    var masked = orAPIKey.slice(0,8)+"...";
+    el.textContent = "✅ Conectado ("+masked+") · "+orModel.split("/")[1];
+    el.style.color = "var(--grn)";
+  } else {
+    el.textContent = "⚠️ No configurado";
+    el.style.color = "var(--go)";
+  }
+}
+
+async function generateWithIA(){
+  var btn = document.getElementById("btn-generate-ia");
+  if(!btn) return;
+  
+  // Verificar config
+  if(!orAPIKey || !orAPIKey.startsWith("sk-or-")){
+    showNotif("❌ Configura tu API Key de OpenRouter primero (🤖 en la sección de abajo)","var(--rd)");
+    toggleORConfig();
+    return;
+  }
+  
+  // Elegir nicho
+  var usedIds = generatedPosts.map(function(p){return p.id;});
+  var available = SHADOW_NICHES.filter(function(n){return usedIds.indexOf(n.id)<0;});
+  if(available.length===0) available = SHADOW_NICHES;
+  var niche = available[Math.floor(Math.random()*available.length)];
+  
+  btn.disabled = true;
+  btn.textContent = "⏳ Generando...";
+  showNotif("🤖 Llamando a OpenRouter IA para: "+niche.name+"...","var(--cy)");
+  
+  // Llamar al API endpoint con la key
+  var endpoints = API_ENDPOINTS.slice();
+  var success = false;
+  
+  for(var e=0;e<endpoints.length;e++){
+    try {
+      var resp = await fetch(endpoints[e]+"/api/seo/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer "+orAPIKey,
+          "X-OpenRouter-Key": orAPIKey
+        },
+        body: JSON.stringify({
+          niche_name: niche.name,
+          niche_cat: niche.cat,
+          cpc: niche.cpc_avg,
+          keywords: niche.kw || [],
+          language: "es"
+        ,
+          api_key: orAPIKey
+        }),
+        signal: AbortSignal.timeout(60000)
+      });
+      
+      if(resp.ok){
+        var data = await resp.json();
+        if(data.success){
+          // Crear post con contenido generado por IA
+          var traffic = Math.floor(2000 + Math.random()*8000);
+          var estimatedYield = (traffic * 0.02 * niche.cpc_avg).toFixed(2);
+          var timestamp = new Date().toLocaleDateString("es-ES",{year:"numeric",month:"long",day:"numeric"});
+          
+          var post = {
+            id: niche.id+"-ia-"+Date.now(),
+            name: niche.name,
+            cat: niche.cat,
+            cpc: niche.cpc_avg,
+            traffic: traffic,
+            keywords: (niche.kw||[]).length,
+            keywordsStr: (niche.kw||[]).join(", "),
+            yield: estimatedYield,
+            timestamp: timestamp,
+            status: "Nuevo (IA)",
+            metaDesc: data.meta_description || "",
+            content: data.content || "",
+            faqs: data.faqs || [],
+            editedTitle: data.title || niche.name,
+            edited: true,
+            ia_generated: true
+          };
+          
+          generatedPosts.unshift(post);
+          localStorage.setItem("infinito_shadow_posts",JSON.stringify(generatedPosts));
+          renderShadowPosts();
+          updateShadowStats();
+          
+          showNotif("✅ Artículo generado con IA: "+data.title+" | $"+(traffic*0.02*niche.cpc_avg).toFixed(2)+"/mes","var(--grn)");
+          success = true;
+          break;
+        }
+      }
+    } catch(err) {
+      console.warn("Endpoint "+endpoints[e]+" failed:", err);
+    }
+  }
+  
+  if(!success){
+    // Fallback: generar con datos locales
+    showNotif("⚠️ API no disponible, usando generación local","var(--go)");
+    finalizePost(niche);
+  }
+  
+  btn.disabled = false;
+  btn.textContent = "🤖 Generar con IA";
+}
+
+// Restore OR display on load
+(function(){
+  updateORDisplay();
+})();
+
+// ─── SHADOW SILO — POST VIEWER & PUBLISH ───
 var viewerCurrentIndex = -1;
 var monetagSiteID = localStorage.getItem("infinito_monetag_siteid") || "";
 var monetagEnabled = localStorage.getItem("infinito_monetag_enabled") === "true";
