@@ -1,0 +1,45 @@
+# 📋 Render Blueprint — Proyecto Infinito API
+# =============================================
+# Este archivo permite deploy automático desde GitHub.
+# Render lo detecta y configura el servicio solo.
+#
+# 1. Conecta tu repo a Render
+# 2. Render lee este archivo y crea el servicio
+# 3. Obtienes: https://proyecto-infinito-api.onrender.com
+#
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # ─── API Web (FastAPI) ───
+  - type: web
+    name: proyecto-infinito-api
+    runtime: docker
+    repo: https://github.com/aonetworkcrm-art/infinito_tokenizacion_casa
+    plan: free
+    region: ohio
+
+    # ─── Endpoint que Render usa para verificar que el servicio vive ───
+    # Debe responder 200 OK, o Render reinicia el servicio
+    healthCheckPath: /api/health
+
+    # ─── Variables de entorno ───
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12
+      - key: ENVIRONMENT
+        value: production
+      # ─── Para usar variables secretas (API keys), agrégalas aquí:
+      # - key: OPENROUTER_API_KEY
+      #   sync: false  # Render te pedirá el valor en el dashboard
+
+    # ─── Auto-deploy: cada vez que hagas push a master ───
+    autoDeploy: true
+
+    # ─── Escalado (free tier = 1 instancia, 512MB RAM) ───
+    scaling:
+      minInstances: 0    # 0 = se duerme a los 15 min de inactividad
+      maxInstances: 1    # Solo 1 en free tier
+
+    # ─── Puerto que expone el contenedor ───
+    # Coincide con EXPOSE en el Dockerfile
+    port: 8000

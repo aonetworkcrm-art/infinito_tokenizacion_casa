@@ -2,9 +2,11 @@
 # =========================================
 # Compatible con Vercel Serverless Python Runtime
 
-# ─── Core Web (FastAPI + ASGI — Vercel lo usa nativamente) ───
+# ─── Core Web (FastAPI + ASGI) ───
 fastapi>=0.117.1
-uvicorn>=0.30.0      # Para desarrollo local (Vercel no lo necesita)
+uvicorn>=0.30.0      # Para desarrollo local
+# Gunicorn para producción (Render, VPS) — maneja workers, reinicios, timeouts
+gunicorn>=23.0.0
 
 # ─── CORS ───
 # fastapi ya incluye CORSMiddleware
