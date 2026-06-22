@@ -648,6 +648,80 @@ Los snapshots se guardan en `tests/snapshots/chromium/` y cubren:
 
 ---
 
+## 🌐 CLOUDFLARE TUNNEL — Exponer Backend sin VPS
+
+### 🎯 Propósito
+Exponer el API Server (FastAPI) local a internet **sin VPS, sin abrir puertos, sin IP pública**. Cloudflare crea un túnel HTTPS seguro desde tu PC a su red CDN global.
+
+### 📦 Requisitos
+- Windows 10/11
+- Una cuenta gratuita de Cloudflare (https://cloudflare.com)
+- Cloudflared instalado (ya está: `winget install Cloudflare.cloudflared`)
+
+### 🚀 Cómo Usar
+
+#### 1. Primera vez (autenticación)
+Ejecuta el script de inicio. La primera vez abrirá el navegador para que te loguees en Cloudflare:
+
+```bash
+cd /c/proyecto-infinito
+scripts/iniciar_tunnel.bat
+```
+
+#### 2. Obtener la URL del túnel
+Cuando el túnel esté corriendo, busca en la terminal una línea como:
+```
+INFERIRE... https://infinito-api-nombre-aleatorio.trycloudflare.com
+```
+
+#### 3. Configurar la DApp
+En el Shadow Silo de la DApp:
+1. Haz clic en "🌐 API Endpoint"
+2. Pega la URL del túnel (ej: `https://infinito-api-nombre-aleatorio.trycloudflare.com`)
+3. Haz clic en "💾 Guardar"
+4. Ahora "Generar Siguiente Post" usará el túnel primero
+
+### 🔄 Orden de Conexión (Auto-Fallback)
+
+```
+1. http://localhost:8000 (API local — cuando estás desarrollando)
+2. https://tu-tunnel.trycloudflare.com (si configuraste URL del túnel)
+3. Datos locales embebidos (SHADOW_NICHES — siempre funciona, sin internet)
+```
+
+### 📁 Archivos
+
+| Archivo | Descripción |
+|---------|-------------|
+| `scripts/iniciar_tunnel.bat` | Script principal: inicia API + Tunnel |
+| `scripts/config_tunnel.yml` | Template de configuración del túnel |
+
+### ⚙️ El Script Hace Todo Esto:
+
+```
+1. Verifica si cloudflared está autenticado
+   - Si NO: abre navegador para login
+2. Verifica si el túnel 'infinito-api' existe
+   - Si NO: lo crea automáticamente
+3. Crea la configuración del túnel (→ localhost:8000)
+4. Instala uvicorn si no está
+5. Inicia el FastAPI Server (ventana separada)
+6. Inicia el Cloudflare Tunnel
+7. Muestra la URL pública en la terminal
+8. Al cerrar, detiene todo
+```
+
+### 💡 Notas
+- **Sin tarjeta de crédito**: Cloudflare Tunnel es completamente gratis
+- **Sin puertos abiertos**: No necesitas configurar el router
+- **HTTPS automático**: Cloudflare maneja los certificados SSL
+- **24/7**: El túnel funciona mientras tu PC esté encendida y el script corriendo
+
+### ❌ Para Detener
+Solo cierra la ventana del túnel (Ctrl+C). El script apagará el API automáticamente.
+
+---
+
 ## 🛠️ COMANDOS ÚTILES
 
 ### DApp

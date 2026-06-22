@@ -647,13 +647,19 @@ const FAMILY_WALLETS = {
 <span class="vl" id="tunnel-current" style="color:var(--cy);font-size:9px">localhost:8000</span>
 </div>
 <div id="tunnel-config-form" style="display:none;padding:8px;border:1px solid var(--border);margin-top:4px">
-<div style="display:flex;gap:6px">
-<input class="inp" id="tunnel-url-input" type="text" placeholder="https://tunel-id.trycloudflare.com" style="font-size:9px;flex:1;font-family:monospace">
+<div style="display:flex;gap:6px;flex-wrap:wrap">
+<select id="api-preset-select" onchange="applyAPIPreset(this.value)" style="background:var(--card);color:var(--text);border:1px solid var(--border);padding:4px 8px;font-size:9px;flex:1">
+<option value="">— Elegir preset —</option>
+<option value="localhost">🖥️ Localhost:8000</option>
+<option value="vercel">▲ Vercel (serverless)</option>
+<option value="cloudflare">🌐 Cloudflare Tunnel</option>
+</select>
+<input class="inp" id="tunnel-url-input" type="text" placeholder="https://tu-api.vercel.app" style="font-size:9px;flex:2;min-width:200px;font-family:monospace">
 <button class="bt" style="padding:4px 10px;font-size:8px" onclick="saveTunnelURL()">💾 Guardar</button>
 </div>
 <div style="font-size:8px;color:var(--dim);margin-top:4px">
-💡 Pega la URL del túnel Cloudflare cuando esté corriendo.
-Si no hay URL, usa localhost:8000.
+💡 Elige un preset o pega la URL directamente. El orden de conexión es:
+localhost → URL guardada → datos locales.
 </div>
 </div>
 </div>
@@ -1239,9 +1245,30 @@ function saveTunnelURL(){
   if(!inp) return;
   tunnelURL = inp.value.trim();
   localStorage.setItem("infinito_tunnel_url", tunnelURL);
+  updateTunnelDisplay();
+  showNotif("🌐 Endpoint API actualizado: "+(tunnelURL || "localhost:8000"),"var(--cy)");
+}
+
+function applyAPIPreset(preset){
+  var inp = document.getElementById("tunnel-url-input");
+  if(!inp) return;
+  var urls = {
+    "localhost": "http://localhost:8000",
+    "vercel": "https://proyecto-infinito-api.vercel.app",
+    "cloudflare": "https://infinito-api.trycloudflare.com",
+  };
+  if(urls[preset]){
+    inp.value = urls[preset];
+  }
+}
+
+function updateTunnelDisplay(){
   var el = document.getElementById("tunnel-current");
   if(el) el.textContent = tunnelURL || "localhost:8000";
-  showNotif("🌐 Endpoint API actualizado: "+(tunnelURL || "localhost:8000"),"var(--cy)");
+  // Update API_ENDPOINTS
+  API_ENDPOINTS.length = 0;
+  API_ENDPOINTS.push("http://localhost:8000");
+  if(tunnelURL) API_ENDPOINTS.push(tunnelURL);
 }
 
 // Restore tunnel URL display on load
@@ -1292,7 +1319,9 @@ function generateNextPost(){
 }
 
 function tryAllEndpoints(idx){
-  if(idx >= API_ENDPOINTS.length){
+  // Use a copy to avoid race conditions if API_ENDPOINTS is modified
+  var endpoints = API_ENDPOINTS.slice();
+  if(idx >= endpoints.length){
     // All endpoints failed, use local data
     createPostFromLocal();
     var btns = document.querySelectorAll(".bt-gr");
@@ -1305,7 +1334,7 @@ function tryAllEndpoints(idx){
     return;
   }
   
-  var url = API_ENDPOINTS[idx] + "/api/seo/niches?min_cpc=80";
+  var url = endpoints[idx] + "/api/seo/niches?min_cpc=80";
   fetch(url, {signal: AbortSignal.timeout(5000)})
     .then(function(r){
       if(!r.ok) throw new Error("HTTP "+r.status);

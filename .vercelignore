@@ -1,0 +1,47 @@
+# ─── Proyecto Infinito — Vercel Ignore ───
+
+# Tests
+tests/
+test-results/
+playwright-report/
+*.spec.js
+
+# Blockchain
+blockchain/
+contratos/
+*.sol
+
+# Documentación local
+investigacion/
+documentos/
+GUIA_COMPLETA_*.md
+README.md
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+.pytest_cache/
+
+# Node (no necesario en producción)
+node_modules/
+package.json
+package-lock.json
+
+# Git
+.git/
+.gitignore
+
+# Scripts locales
+scripts/
+
+# Archivos temporales
+*.bat
+*.ps1
+*.sh
+*.log
+.env
+.env.example
+
+# Contenido SEO generado (se genera en tiempo real)
+contenido/
