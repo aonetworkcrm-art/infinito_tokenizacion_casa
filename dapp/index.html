@@ -640,6 +640,23 @@ const FAMILY_WALLETS = {
 <button class="bt bt-gr" onclick="generateNextPost()">🌑 Generar Siguiente Post</button>
 <button class="bt bt-cy" onclick="autoPilotGenerateNow()" style="font-size:9px;padding:6px 14px">⚡ Generar Ahora (Auto)</button>
 </div>
+
+<div id="tunnel-config" style="margin-top:8px">
+<div class="dr" style="cursor:pointer" onclick="toggleTunnelConfig()">
+<span class="lb">🌐 API Endpoint</span>
+<span class="vl" id="tunnel-current" style="color:var(--cy);font-size:9px">localhost:8000</span>
+</div>
+<div id="tunnel-config-form" style="display:none;padding:8px;border:1px solid var(--border);margin-top:4px">
+<div style="display:flex;gap:6px">
+<input class="inp" id="tunnel-url-input" type="text" placeholder="https://tunel-id.trycloudflare.com" style="font-size:9px;flex:1;font-family:monospace">
+<button class="bt" style="padding:4px 10px;font-size:8px" onclick="saveTunnelURL()">💾 Guardar</button>
+</div>
+<div style="font-size:8px;color:var(--dim);margin-top:4px">
+💡 Pega la URL del túnel Cloudflare cuando esté corriendo.
+Si no hay URL, usa localhost:8000.
+</div>
+</div>
+</div>
 <div id="shadow-posts-container" style="margin-top:12px"></div>
 </div>
 </div>
@@ -1204,6 +1221,35 @@ showNotif("💾 Wallets guardadas localmente ("+Object.keys(wallets).length+" di
 }
 renderFamilyWallets();
 
+// ─── TUNNEL URL CONFIG ───
+var tunnelURL = localStorage.getItem("infinito_tunnel_url") || "";
+
+function toggleTunnelConfig(){
+  var form = document.getElementById("tunnel-config-form");
+  if(!form) return;
+  form.style.display = form.style.display==="none"?"block":"none";
+  if(form.style.display==="block"){
+    var inp = document.getElementById("tunnel-url-input");
+    if(inp) inp.value = tunnelURL;
+  }
+}
+
+function saveTunnelURL(){
+  var inp = document.getElementById("tunnel-url-input");
+  if(!inp) return;
+  tunnelURL = inp.value.trim();
+  localStorage.setItem("infinito_tunnel_url", tunnelURL);
+  var el = document.getElementById("tunnel-current");
+  if(el) el.textContent = tunnelURL || "localhost:8000";
+  showNotif("🌐 Endpoint API actualizado: "+(tunnelURL || "localhost:8000"),"var(--cy)");
+}
+
+// Restore tunnel URL display on load
+(function(){
+  var el = document.getElementById("tunnel-current");
+  if(el) el.textContent = tunnelURL || "localhost:8000";
+})();
+
 // ─── SHADOW SILO — GENERATE NEXT POST ───
 var generatedPosts = JSON.parse(localStorage.getItem("infinito_shadow_posts")||"[]");
 
@@ -1221,6 +1267,15 @@ var SHADOW_NICHES = [
   {id:"enterprise-cyber",name:"Ciberseguridad Empresarial",cat:"Tecnología B2B",cpc_min:90,cpc_max:160,cpc_avg:120,vol:"alto",dificultad:"alta",evergreen:9,intent:"comercial",kw:["enterprise cybersecurity solutions","managed detection response","cloud security business","zero trust security","ransomware protection"]}
 ];
 
+var API_ENDPOINTS = [
+  "http://localhost:8000",
+];
+
+// Add tunnel URL if configured
+if(typeof tunnelURL !== 'undefined' && tunnelURL) {
+  API_ENDPOINTS.push(tunnelURL);
+}
+
 function generateNextPost(){
   // Find the button by its onclick context
   var btns = document.querySelectorAll(".bt-gr");
@@ -1233,16 +1288,45 @@ function generateNextPost(){
   }
   if(btn) btn.disabled = true;
   
-  // Try API first, fallback to local
-  fetch("http://localhost:8000/api/seo/niches?min_cpc=80")
-    .then(function(r){return r.json()})
+  tryAllEndpoints(0);
+}
+
+function tryAllEndpoints(idx){
+  if(idx >= API_ENDPOINTS.length){
+    // All endpoints failed, use local data
+    createPostFromLocal();
+    var btns = document.querySelectorAll(".bt-gr");
+    for(var b=0;b<btns.length;b++){
+      if(btns[b].textContent.indexOf("Generar Siguiente Post")>=0){
+        btns[b].disabled = false;
+        break;
+      }
+    }
+    return;
+  }
+  
+  var url = API_ENDPOINTS[idx] + "/api/seo/niches?min_cpc=80";
+  fetch(url, {signal: AbortSignal.timeout(5000)})
+    .then(function(r){
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return r.json();
+    })
     .then(function(data){
       var niches = data.niches || [];
-      if(niches.length>0) createPostFromData(niches);
-      else createPostFromLocal();
+      if(niches.length>0){
+        createPostFromData(niches);
+        var btns = document.querySelectorAll(".bt-gr");
+        for(var b=0;b<btns.length;b++){
+          if(btns[b].textContent.indexOf("Generar Siguiente Post")>=0){
+            btns[b].disabled = false;
+            break;
+          }
+        }
+      } else {
+        tryAllEndpoints(idx+1);
+      }
     })
-    .catch(function(){createPostFromLocal();})
-    .finally(function(){if(btn) btn.disabled = false;});
+    .catch(function(){tryAllEndpoints(idx+1);});
 }
 
 function createPostFromData(niches){

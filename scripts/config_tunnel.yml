@@ -1,0 +1,22 @@
+# 🌐 Cloudflare Tunnel — Proyecto Infinito API
+# =============================================
+# Este archivo se genera automáticamente al ejecutar iniciar_tunnel.bat
+# pero puedes editarlo manualmente si lo prefieres.
+#
+# Para crear el túnel manualmente:
+#   1. cloudflared tunnel login (abre navegador — logueate con tu cuenta Cloudflare)
+#   2. cloudflared tunnel create infinito-api
+#   3. Copiar el TUNNEL_ID del paso anterior aquí abajo
+#   4. cloudflared tunnel route dns infinito-api api-infinito.tudominio.com
+#      (opcional — si tienes dominio. Si no, se usa trycloudflare.com automático)
+
+tunnel: TU_TUNNEL_ID_AQUI
+credentials-file: C:\Users\somet\.cloudflared\TU_TUNNEL_ID_AQUI.json
+
+ingress:
+  - hostname: "*"
+    service: http://localhost:8000
+  # Si quieres servir la DApp también:
+  # - hostname: "dapp.tudominio.com"
+  #   service: http://localhost:5500
+  # - service: http_status:404
