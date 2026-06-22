@@ -120,6 +120,28 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 .ft{margin-top:40px;padding:16px 0;border-top:1px solid var(--border);text-align:center;font-size:9px;color:var(--dim);letter-spacing:1px}
 .inp{background:transparent;border:1px solid var(--border);color:var(--text);padding:6px 10px;font-size:11px;width:100%;transition:border-color 0.3s}
 .inp:focus{border-color:var(--grn);outline:none}
+.inp-ta{min-height:60px;resize:vertical;font-family:inherit;line-height:1.6}
+.editor-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;overflow-y:auto;padding:20px}
+.editor-overlay.act{display:flex}
+.editor-modal{background:var(--card);border:1px solid var(--border);width:100%;max-width:800px;max-height:90vh;overflow-y:auto;padding:24px;animation:fi 0.3s ease}
+.editor-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.editor-hdr-t{font-size:13px;color:var(--cy);letter-spacing:2px;text-transform:uppercase}
+.editor-hdr-close{cursor:pointer;font-size:18px;color:var(--dim);transition:color 0.3s;background:none;border:none;padding:4px 8px}
+.editor-hdr-close:hover{color:var(--rd)}
+.editor-gr{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.editor-gr-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.editor-lb{font-size:9px;color:var(--grn);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;display:block}
+.editor-sec{margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.editor-sec:last-child{border-bottom:none;margin-bottom:0}
+.editor-sec-tt{font-size:10px;color:var(--cy);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.editor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+.editor-preview{background:rgba(0,0,0,0.3);border:1px solid var(--border);padding:16px;margin-top:12px;max-height:300px;overflow-y:auto;font-size:11px;line-height:1.6;white-space:pre-wrap;font-family:monospace;color:var(--dim)}
+.editor-preview .hl{color:var(--cy)}
+.editor-preview .tag{color:var(--grn)}
+.faq-item-ed{margin-bottom:8px;padding:8px;border:1px solid var(--border);position:relative}
+.faq-item-ed .faq-del{position:absolute;top:4px;right:4px;cursor:pointer;color:var(--rd);font-size:12px;background:none;border:none}
+.post-clickable{cursor:pointer;transition:border-color 0.3s}
+.post-clickable:hover{border-color:var(--cy)!important}
 #notif{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;padding:10px 24px;font-size:10px;letter-spacing:1px;border:1px solid var(--border);background:var(--card);color:var(--grn);display:none;animation:to 3s ease forwards;pointer-events:none}
 #notif.show{display:block}
 @media(max-width:768px){.container{padding:12px}.hdr{flex-direction:column;text-align:center}.hdr-stats{gap:12px}.cd-lg{grid-column:span 1}.dl{grid-template-columns:1fr}}
@@ -619,6 +641,79 @@ const FAMILY_WALLETS = {
 <button class="bt bt-cy" onclick="autoPilotGenerateNow()" style="font-size:9px;padding:6px 14px">⚡ Generar Ahora (Auto)</button>
 </div>
 <div id="shadow-posts-container" style="margin-top:12px"></div>
+</div>
+</div>
+</div>
+
+<!-- ─── EDITOR MODAL ─── -->
+<div class="editor-overlay" id="editor-overlay">
+<div class="editor-modal" id="editor-modal">
+<div class="editor-hdr">
+<div class="editor-hdr-t">✏️ Editar Post</div>
+<button class="editor-hdr-close" onclick="closePostEditor()">✕</button>
+</div>
+
+<input type="hidden" id="editor-index" value="-1">
+
+<div class="editor-gr">
+<div>
+<label class="editor-lb">Título del Post</label>
+<input class="inp" id="editor-title" type="text" style="font-size:11px">
+</div>
+<div>
+<label class="editor-lb">Nicho / Categoría</label>
+<input class="inp" id="editor-niche" type="text" style="font-size:11px">
+</div>
+</div>
+
+<div class="editor-gr-3">
+<div>
+<label class="editor-lb">CPC ($)</label>
+<input class="inp" id="editor-cpc" type="number" step="1" style="font-size:11px">
+</div>
+<div>
+<label class="editor-lb">Tráfico/mes</label>
+<input class="inp" id="editor-traffic" type="number" style="font-size:11px">
+</div>
+<div>
+<label class="editor-lb">Yield ($)</label>
+<input class="inp" id="editor-yield" type="text" readonly style="font-size:11px;opacity:0.6">
+</div>
+</div>
+
+<div class="editor-sec">
+<label class="editor-lb">Keywords (separadas por coma)</label>
+<textarea class="inp inp-ta" id="editor-keywords" style="font-size:10px"></textarea>
+</div>
+
+<div class="editor-sec">
+<label class="editor-lb">Meta Description (SEO)</label>
+<textarea class="inp inp-ta" id="editor-metadesc" style="font-size:10px" maxlength="160"></textarea>
+</div>
+
+<div class="editor-sec">
+<label class="editor-lb">Contenido del Post</label>
+<textarea class="inp inp-ta" id="editor-content" style="min-height:100px;font-size:10px;line-height:1.7"></textarea>
+</div>
+
+<div class="editor-sec">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<label class="editor-lb" style="margin:0">Preguntas Frecuentes (FAQ Schema)</label>
+<button class="bt" style="padding:2px 10px;font-size:8px" onclick="addFAQField()">+ Agregar FAQ</button>
+</div>
+<div id="editor-faqs"></div>
+</div>
+
+<div class="editor-sec">
+<label class="editor-lb">Vista Previa del HTML Generado</label>
+<div class="editor-preview" id="editor-preview">Haz clic en "Previsualizar HTML" para ver el código generado.</div>
+</div>
+
+<div class="editor-actions">
+<button class="bt bt-gr" onclick="previewPostHTML()">👁️ Previsualizar HTML</button>
+<button class="bt bt-go" onclick="publishPostHTML()">📤 Publicar &amp; Descargar HTML</button>
+<button class="bt bt-cy" onclick="savePostEdit()">💾 Guardar Cambios</button>
+<button class="bt" style="border-color:var(--rd);color:var(--rd)" onclick="closePostEditor()">✕ Cerrar</button>
 </div>
 </div>
 </div>
@@ -1201,16 +1296,17 @@ function renderShadowPosts(){
     container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--dim);font-size:10px">Aún no hay posts generados. Haz clic en "Generar Siguiente Post".</div>';
     return;
   }
-  var html = '<div class="sec-tt" style="font-size:10px;margin-top:0">📄 Posts Generados Dinámicamente</div>';
+  var html = '<div class="sec-tt" style="font-size:10px;margin-top:0">📄 Posts Generados <span style="font-size:8px;color:var(--dim);font-weight:400">— Haz clic para editar</span></div>';
   for(var i=0;i<generatedPosts.length;i++){
     var p = generatedPosts[i];
     var statusClass = i===0 ? "bg bg-go" : "bg bg-gr";
-    var statusText = i===0 ? "🆕 Recién Generado" : "✅ Indexado";
-    html += '<div class="cd" style="margin-bottom:8px">';
+    var statusText = i===0 ? "🆕 Recién" : "✅ Indexado";
+    var edited = p.edited ? ' <span style="color:var(--go);font-size:8px">✏️ Editado</span>' : '';
+    html += '<div class="cd post-clickable" onclick="openPostEditor('+i+')" style="margin-bottom:8px">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">';
     html += '<div>';
-    html += '<div style="font-size:11px;color:var(--cy);font-weight:600">📝 '+p.name+'</div>';
-    html += '<div style="font-size:9px;color:var(--dim);margin-top:4px">CPC: $'+p.cpc+' · Tráfico Est.: '+p.traffic.toLocaleString()+'/mes · Yield: $'+p.yield+' · '+p.timestamp+'</div>';
+    html += '<div style="font-size:11px;color:var(--cy);font-weight:600">📝 '+(p.editedTitle||p.name)+''+edited+'</div>';
+    html += '<div style="font-size:9px;color:var(--dim);margin-top:4px">CPC: $'+p.cpc+' · Tráfico: '+p.traffic.toLocaleString()+'/mes · Yield: $'+p.yield+' · '+p.timestamp+'</div>';
     html += '</div>';
     html += '<div class="'+statusClass+'"><span class="dot"></span>'+statusText+'</div>';
     html += '</div></div>';
@@ -1398,6 +1494,271 @@ if(autoPilotConfig.enabled){
 }
 autoPilotRender();
 autoPilotTick();
+
+// ─── SHADOW SILO — EDITOR DE POSTS ───
+function openPostEditor(index){
+  var overlay = document.getElementById("editor-overlay");
+  if(!overlay) return;
+  var post = generatedPosts[index];
+  if(!post) return;
+  
+  document.getElementById("editor-index").value = index;
+  document.getElementById("editor-title").value = post.editedTitle || post.name || '';
+  document.getElementById("editor-niche").value = post.cat || post.name || '';
+  document.getElementById("editor-cpc").value = post.cpc || '';
+  document.getElementById("editor-traffic").value = post.traffic || '';
+  document.getElementById("editor-yield").value = '$'+(post.yield||'0.00');
+  
+  // Keywords
+  var kwStr = '';
+  if(post.keywordsStr) kwStr = post.keywordsStr;
+  else if(post.kw && post.kw.length) kwStr = post.kw.join(', ');
+  document.getElementById("editor-keywords").value = kwStr;
+  
+  // Meta description
+  document.getElementById("editor-metadesc").value = post.metaDesc || 'Guía completa sobre '+post.name+'. CPC: $'+post.cpc+'. Información actualizada.';
+  
+  // Content
+  document.getElementById("editor-content").value = post.content || 'Contenido del artículo sobre '+post.name+'. Este es un post generado automáticamente por el Shadow Silo del Proyecto Infinito.';
+  
+  // FAQs
+  renderFAQFields(post.faqs || []);
+  
+  document.getElementById("editor-preview").textContent = 'Haz clic en "Previsualizar HTML" para ver el código generado.';
+  overlay.classList.add("act");
+  document.body.style.overflow = "hidden";
+}
+
+function closePostEditor(){
+  var overlay = document.getElementById("editor-overlay");
+  if(!overlay) return;
+  overlay.classList.remove("act");
+  document.body.style.overflow = "";
+}
+
+function savePostEdit(){
+  var idx = parseInt(document.getElementById("editor-index").value);
+  if(idx<0 || idx>=generatedPosts.length) return;
+  var post = generatedPosts[idx];
+  
+  post.editedTitle = document.getElementById("editor-title").value.trim() || post.name;
+  post.cpc = parseFloat(document.getElementById("editor-cpc").value) || post.cpc;
+  post.traffic = parseInt(document.getElementById("editor-traffic").value) || post.traffic;
+  post.keywordsStr = document.getElementById("editor-keywords").value.trim();
+  post.metaDesc = document.getElementById("editor-metadesc").value.trim();
+  post.content = document.getElementById("editor-content").value.trim();
+  post.cat = document.getElementById("editor-niche").value.trim() || post.cat;
+  post.edited = true;
+  
+  // Recalculate yield
+  var ctr = 0.02;
+  post.yield = (post.traffic * ctr * post.cpc).toFixed(2);
+  
+  // Save FAQs
+  post.faqs = [];
+  var faqEls = document.querySelectorAll(".faq-item-ed");
+  for(var f=0;f<faqEls.length;f++){
+    var q = faqEls[f].querySelector(".faq-q-inp");
+    var a = faqEls[f].querySelector(".faq-a-inp");
+    if(q && a && q.value.trim() && a.value.trim()){
+      post.faqs.push({question: q.value.trim(), answer: a.value.trim()});
+    }
+  }
+  
+  generatedPosts[idx] = post;
+  localStorage.setItem("infinito_shadow_posts",JSON.stringify(generatedPosts));
+  renderShadowPosts();
+  updateShadowStats();
+  showNotif("💾 Post guardado: "+post.editedTitle,"var(--grn)");
+}
+
+function renderFAQFields(faqs){
+  var container = document.getElementById("editor-faqs");
+  if(!container) return;
+  if(!faqs || faqs.length===0){
+    faqs = [{question:"¿Qué es "+document.getElementById("editor-title").value+"?",answer:"Es un servicio/proyecto relacionado con..."}];
+  }
+  var html = '';
+  for(var i=0;i<faqs.length;i++){
+    html += '<div class="faq-item-ed">';
+    html += '<button class="faq-del" onclick="removeFAQField(this)">✕</button>';
+    html += '<input class="inp faq-q-inp" type="text" placeholder="Pregunta..." value="'+escapeHTML(faqs[i].question)+'" style="font-size:10px;margin-bottom:4px">';
+    html += '<textarea class="inp inp-ta faq-a-inp" placeholder="Respuesta..." style="font-size:10px;min-height:40px">'+escapeHTML(faqs[i].answer)+'</textarea>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function addFAQField(){
+  var container = document.getElementById("editor-faqs");
+  if(!container) return;
+  var div = document.createElement("div");
+  div.className = "faq-item-ed";
+  div.innerHTML = '<button class="faq-del" onclick="removeFAQField(this)">✕</button><input class="inp faq-q-inp" type="text" placeholder="Pregunta..." style="font-size:10px;margin-bottom:4px"><textarea class="inp inp-ta faq-a-inp" placeholder="Respuesta..." style="font-size:10px;min-height:40px"></textarea>';
+  container.appendChild(div);
+  showNotif("➕ Nueva FAQ agregada","var(--cy)");
+}
+
+function removeFAQField(btn){
+  var item = btn.parentElement;
+  if(item) item.parentElement.removeChild(item);
+}
+
+function escapeHTML(str){
+  if(typeof str!=='string') return '';
+  return str.replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function generatePostHTML(post){
+  var title = post.editedTitle || post.name;
+  var niche = post.cat || 'SEO';
+  var cpc = post.cpc || 0;
+  var traffic = post.traffic || 0;
+  var yieldVal = post.yield || '0.00';
+  var keywords = post.keywordsStr || (post.kw?post.kw.join(', '):title);
+  var metaDesc = post.metaDesc || 'Guía completa sobre '+title+'. Información actualizada con CPC de $'+cpc+'. Consulta gratuita disponible.';
+  var content = post.content || 'Contenido del artículo sobre '+title+'.';
+  var faqs = post.faqs || [];
+  var slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'post';
+  var date = new Date().toISOString().split('T')[0];
+  
+  // Build FAQ Schema JSON-LD
+  var faqSchema = '';
+  if(faqs.length>0){
+    var items = faqs.map(function(f){
+      return '        {"@type":"Question","name":'+JSON.stringify(f.question)+',"acceptedAnswer":{"@type":"Answer","text":'+JSON.stringify(f.answer)+'}}';
+    });
+    faqSchema = '{\n    "@context": "https://schema.org",\n    "@type": "FAQPage",\n    "mainEntity": [\n'+items.join(',\n')+'\n    ]\n}';
+  }
+  
+  // Article Schema
+  var articleSchema = '{\n    "@context": "https://schema.org",\n    "@type": "Article",\n    "headline": '+JSON.stringify(title)+',\n    "description": '+JSON.stringify(metaDesc)+',\n    "datePublished": "'+date+'",\n    "dateModified": "'+date+'",\n    "author": {"@type":"Person","name":"Proyecto Infinito"},\n    "publisher": {"@type":"Organization","name":"Proyecto Infinito"}\n}';
+  
+  // Build HTML
+  var html = '<!DOCTYPE html>\n<html lang="es">\n<head>\n';
+  html += '    <meta charset="UTF-8">\n';
+  html += '    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n';
+  html += '    <title>'+escapeHTML(title)+'</title>\n';
+  html += '    <meta name="description" content="'+escapeHTML(metaDesc)+'">\n';
+  html += '    <meta name="keywords" content="'+escapeHTML(keywords)+'">\n';
+  html += '    <meta name="robots" content="index, follow">\n';
+  html += '    <meta property="og:type" content="article">\n';
+  html += '    <meta property="og:title" content="'+escapeHTML(title)+'">\n';
+  html += '    <meta property="og:description" content="'+escapeHTML(metaDesc)+'">\n';
+  html += '    <meta property="og:locale" content="es_ES">\n';
+  html += '    <meta name="twitter:card" content="summary_large_image">\n';
+  html += '    <meta name="twitter:title" content="'+escapeHTML(title)+'">\n';
+  html += '    <link rel="canonical" href="https://proyectoinfinito.com/'+slug+'/">\n';
+  if(faqSchema) html += '    <script type="application/ld+json">\n'+faqSchema+'\n    <\/script>\n';
+  html += '    <script type="application/ld+json">\n'+articleSchema+'\n    <\/script>\n';
+  html += '    <style>\n';
+  html += '        *{margin:0;padding:0;box-sizing:border-box}\n';
+  html += '        :root{--bg:#050508;--grn:#00ff41;--cy:#00f0ff;--text:#c8d6e5;--dim:#2d2d44;--card:#0a0a14;--border:rgba(0,255,65,0.12)}\n';
+  html += '        body{font-family:\'Courier New\',monospace;background:var(--bg);color:var(--text);line-height:1.8}\n';
+  html += '        .container{max-width:900px;margin:0 auto;padding:20px}\n';
+  html += '        h1{font-size:26px;color:var(--cy);margin:20px 0 12px}\n';
+  html += '        h2{font-size:18px;color:var(--grn);margin:28px 0 12px;border-bottom:1px solid var(--border)}\n';
+  html += '        h3{font-size:14px;color:var(--cy);margin:18px 0 8px}\n';
+  html += '        p{font-size:13px;margin:10px 0}\n';
+  html += '        ul,ol{margin:10px 0 10px 20px}\n';
+  html += '        li{font-size:13px;margin:6px 0}\n';
+  html += '        .badge{font-size:10px;color:var(--grn);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:6px;margin-bottom:8px}\n';
+  html += '        .badge .dot{width:5px;height:5px;border-radius:50%;background:var(--grn);animation:pulse 2s ease-in-out infinite}\n';
+  html += '        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}\n';
+  html += '        .intro{padding:16px;border-left:2px solid var(--grn);background:rgba(0,255,65,0.02);margin-bottom:24px;font-size:13px}\n';
+  html += '        .cta{margin:30px 0;padding:20px;border:1px solid var(--border);text-align:center;background:rgba(0,255,65,0.03)}\n';
+  html += '        .cta .btn{display:inline-block;padding:10px 28px;border:1px solid var(--grn);color:var(--grn);text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;transition:all 0.3s}\n';
+  html += '        .cta .btn:hover{background:var(--grn);color:#000}\n';
+  html += '        .faq-item{padding:14px 16px;border:1px solid var(--border);margin-bottom:8px}\n';
+  html += '        .faq-q{font-size:12px;color:var(--cy);font-weight:600;margin-bottom:6px}\n';
+  html += '        .faq-a{font-size:12px;color:var(--dim);line-height:1.7}\n';
+  html += '        footer{margin-top:40px;padding:16px 0;border-top:1px solid var(--border);text-align:center;font-size:9px;color:var(--dim)}\n';
+  html += '    <\/style>\n';
+  html += '</head>\n<body>\n<div class="container">\n';
+  html += '    <header><div class="badge"><span class="dot"></span> PROYECTO INFINITO &middot; '+escapeHTML(niche)+'</div><h1>'+escapeHTML(title)+'</h1></header>\n';
+  html += '    <div class="intro">'+escapeHTML(metaDesc)+'</div>\n';
+  html += '    <div class="content">'+content.replace(/\n/g,'\n    <p>').replace(/<p><p>/g,'<p>')+'</div>\n';
+  
+  if(faqs.length>0){
+    html += '    <div class="cta"><p>¿Tienes preguntas? Cont&aacute;ctanos para una consulta gratuita.</p><a href="#" class="btn">Solicitar Consulta</a></div>\n';
+    html += '    <h2>Preguntas Frecuentes</h2>\n';
+    for(var f=0;f<faqs.length;f++){
+      html += '    <div class="faq-item"><div class="faq-q">'+escapeHTML(faqs[f].question)+'</div><div class="faq-a">'+escapeHTML(faqs[f].answer)+'</div></div>\n';
+    }
+  }
+  
+  html += '    <footer><strong>PROYECTO INFINITO</strong> &mdash; Generado por Shadow Silo &middot; CPC: $'+cpc+' &middot; '+date+'</footer>\n';
+  html += '</div>\n</body>\n</html>';
+  
+  return {html: html, slug: slug, title: title};
+}
+
+function previewPostHTML(){
+  var idx = parseInt(document.getElementById("editor-index").value);
+  if(idx<0 || idx>=generatedPosts.length) return;
+  var post = generatedPosts[idx];
+  
+  // Temporarily save to get latest values
+  post.editedTitle = document.getElementById("editor-title").value.trim() || post.name;
+  post.cpc = parseFloat(document.getElementById("editor-cpc").value) || post.cpc;
+  post.traffic = parseInt(document.getElementById("editor-traffic").value) || post.traffic;
+  post.keywordsStr = document.getElementById("editor-keywords").value.trim();
+  post.metaDesc = document.getElementById("editor-metadesc").value.trim();
+  post.content = document.getElementById("editor-content").value.trim();
+  post.cat = document.getElementById("editor-niche").value.trim() || post.cat;
+  
+  // Get FAQs from DOM
+  post.faqs = [];
+  var faqEls = document.querySelectorAll(".faq-item-ed");
+  for(var f=0;f<faqEls.length;f++){
+    var q = faqEls[f].querySelector(".faq-q-inp");
+    var a = faqEls[f].querySelector(".faq-a-inp");
+    if(q && a && q.value.trim() && a.value.trim()){
+      post.faqs.push({question: q.value.trim(), answer: a.value.trim()});
+    }
+  }
+  
+  var result = generatePostHTML(post);
+  var preview = document.getElementById("editor-preview");
+  if(preview){
+    var html = result.html;
+    // Truncate for preview
+    if(html.length>2000) html = html.slice(0,2000)+'\n\n... (truncado, '+result.html.length+' bytes totales)';
+    preview.textContent = html;
+    preview.scrollTop = 0;
+  }
+  showNotif("👁️ HTML generado: "+(result.html.length/1024).toFixed(1)+" KB","var(--cy)");
+}
+
+function publishPostHTML(){
+  var idx = parseInt(document.getElementById("editor-index").value);
+  if(idx<0 || idx>=generatedPosts.length) return;
+  
+  // Save first
+  savePostEdit();
+  
+  var post = generatedPosts[idx];
+  var result = generatePostHTML(post);
+  
+  // Create download link
+  var blob = new Blob([result.html], {type: 'text/html;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = result.slug + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  // Mark as published
+  post.published = true;
+  post.publishedAt = new Date().toISOString();
+  localStorage.setItem("infinito_shadow_posts",JSON.stringify(generatedPosts));
+  renderShadowPosts();
+  
+  showNotif("📤 HTML publicado: "+result.slug+".html ("+(result.html.length/1024).toFixed(1)+" KB)","var(--grn)");
+}
 
 // ─── HEALTH TRACKER — INYECCIONES Y SÍNTOMAS ───
 var healthData = JSON.parse(localStorage.getItem("infinito_health")||'{"injections":[],"symptoms":[]}');
